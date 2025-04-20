@@ -1,0 +1,21 @@
+{
+  "name": "sito",
+  "version": "1.0.0",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mysql2": "^3.14.0",
+    "nodemon": "^3.1.9",
+    "nunjucks": "^3.2.4",
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.7"
+  }
+}

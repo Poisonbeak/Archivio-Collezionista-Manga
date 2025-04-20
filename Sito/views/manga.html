@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="overview_manga">
+    {% for manga in rows %}
+    <h1>{{ manga.Nome_Manga }}</h1>
+    <div id="info">
+        <p><b>ID: </b>{{ manga.ID_Manga }}</p>
+        <p><b>Edizione: </b>{{ manga.Edizione }}</p>
+        <p><b>A Colori: </b>
+            {% if (manga.A_Colori) %} Sì {% else %} No {% endif %}
+        </p>
+        <p><b>Contenuti Extra: </b>
+            {% if (manga.Contenuti_Extra) %} Sì {% else %} No {% endif %}
+        </p>
+        <p><b>Autore/i: </b>
+            {{ manga.Nome_Autore }} {{ manga.Cognome_Autore }} 
+            {% if (manga.Pseudonimo_Autore != NULL) %} ({{ manga.Pseudonimo_Autore }}) {% endif %}
+        </p>
+        <p><b>Artista/i: </b>
+            {{ manga.Nome_Artista }} {{ manga.Cognome_Artista }} 
+            {% if (manga.Pseudonimo_Artista != NULL) %} ({{ manga.Pseudonimo_Artista }}) {% endif %}
+        </p>
+        <p><b>Editore: </b>{{ manga.Nome_Editore }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="overview_volume">
+    {% for volume in rows %}
+    <h1>{{ volume.Titolo }}</h1>
+    <img id="immagine_volume" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="">
+    <div id="info">
+        <p><b>ISBN: </b>{{ volume.ISBN }}</p>
+        <p><b>Numero volume: </b>{{ volume.N_Volume }}</p>
+        <p><b>Numero Pagine: </b>{{ volume.N_Pagine }}</p>
+        <p><b>Manga: </b><a href="/archivio/manga/{{ volume.Nome }}">{{ volume.Nome }}</a></p>
+        <p><b>Edizione: </b>{{ volume.Edizione }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

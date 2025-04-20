@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block css %}
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    {% endblock %}
+    <title>The Manga Shelf - Collezione di Manga</title>
+</head>
+<body>
+    <div id="header">
+        {% block header %}
+        <div>
+            <a href="/">Home</a>
+        </div>
+        <div>
+            <a href="">La mia collezione</a>
+        </div>
+        <div>
+            <a href="/archivio/volumi">Archivio</a>
+        </div>
+        <div>
+            <a href="">Profilo</a>
+        </div>
+        <div>
+            <a href="">Altri collezionisti</a>
+        </div>
+        {% endblock %}
+    </div>
+
+    <div id="main">
+        {% block content %}
+        <p>Ciao</p>
+        {% endblock %}
+    </div>
+
+    <div id="footer">
+        {% block footer %}
+        <div id="footer_left">
+            <h3>NAVIGAZIONE</h3>
+            <a href="/">Home</a>
+            <a href="">La mia collezione</a>
+            <a href="/archivio/volumi">Archivio</a>
+            <a href="">Profilo</a>
+            <a href="">Altri collezionisti</a>
+        </div>
+        <div id="footer_right">
+            <div>
+                <h3>LINK UTILI</h3>
+                <a href="">Privacy Policy</a>
+                <a href="">Termini e Condizioni</a>
+                <a href="">Trattamento dei dati personali</a>
+            </div>
+            <div id="copyright">
+                <p>&copy; Alfano Michele, Paolini Francesco, Occhipinti Riccardo Giovanni</p>
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+</body>
+{% block js %}
+{% endblock %}
+</html>

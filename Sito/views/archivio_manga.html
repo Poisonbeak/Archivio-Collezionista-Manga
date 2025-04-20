@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="tabella_archivio">
+<h1><a href="/archivio/volumi">Volumi</a> / Manga</h1>
+    <table style="width: 500px;">
+        <tr>
+            <th>Nome</th>
+            <th>Edizione</th>
+            <th>Autore/i</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td><b><a href="/archivio/manga/{{ row.Nome_Manga }}">{{ row.Nome_Manga }}</a></b></td>
+            <td>{{ row.Edizione }}</td>
+            <td>{{ row.Nome_Autore }} {{ row.Cognome_Autore }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
