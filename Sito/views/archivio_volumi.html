@@ -9,15 +9,23 @@
             <th>N_Pagine</th>
             <th>Manga</th>
             <th>Edizione</th>
+            <th>Posseduto</th>
         </tr>
         {% for row in rows %}
         <tr>
-            <td><a href="/archivio/volumi/{{ row.Titolo }}"><b>{{ row.Titolo }}</b></a></td>
+            <td><a href="/archivio/volumi/{{ row.Titolo }}"><b class="titolo_volume">{{ row.Titolo }}</b></a></td>
             <td> {{ row.N_Pagine }}</td>
             <td> {{ row.Nome }}</td>
             <td> {{ row.Edizione }}</td>
+            <td>
+                <input class="checkboxPosseduto" type="checkbox">
+            </td>
         </tr>
         {% endfor %}
     </table>
 </div>
+{% endblock %}
+
+{% block js %}
+<script src="/static/archivio_volumi.js"></script>
 {% endblock %}

@@ -2,26 +2,37 @@
 
 {% block content %}
 <div id="overview_manga">
-    {% for manga in rows %}
-    <h1>{{ manga.Nome_Manga }}</h1>
+    {% for m in manga %}
+    <h1>{{ m.Nome_Manga }}</h1>
     <div id="info">
-        <p><b>ID: </b>{{ manga.ID_Manga }}</p>
-        <p><b>Edizione: </b>{{ manga.Edizione }}</p>
+        <p><b>ID: </b>{{ m.ID_Manga }}</p>
+        <p><b>Edizione: </b>{{ m.Edizione }}</p>
         <p><b>A Colori: </b>
-            {% if (manga.A_Colori) %} Sì {% else %} No {% endif %}
+            {% if (m.A_Colori) %} Sì {% else %} No {% endif %}
         </p>
         <p><b>Contenuti Extra: </b>
-            {% if (manga.Contenuti_Extra) %} Sì {% else %} No {% endif %}
+            {% if (m.Contenuti_Extra) %} Sì {% else %} No {% endif %}
         </p>
         <p><b>Autore/i: </b>
-            {{ manga.Nome_Autore }} {{ manga.Cognome_Autore }} 
-            {% if (manga.Pseudonimo_Autore != NULL) %} ({{ manga.Pseudonimo_Autore }}) {% endif %}
+            {{ m.Nome_Autore }} {{ m.Cognome_Autore }} 
+            {% if (m.Pseudonimo_Autore != NULL) %} ({{ m.Pseudonimo_Autore }}) {% endif %}
         </p>
         <p><b>Artista/i: </b>
-            {{ manga.Nome_Artista }} {{ manga.Cognome_Artista }} 
-            {% if (manga.Pseudonimo_Artista != NULL) %} ({{ manga.Pseudonimo_Artista }}) {% endif %}
+            {{ m.Nome_Artista }} {{ m.Cognome_Artista }} 
+            {% if (m.Pseudonimo_Artista != NULL) %} ({{ m.Pseudonimo_Artista }}) {% endif %}
         </p>
-        <p><b>Editore: </b>{{ manga.Nome_Editore }}</p>
+        <p><b>Editore: </b>{{ m.Nome_Editore }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<h1>Volumi</h1>
+<div id="lista_volumi_manga">
+    {% for volume in volumi %}
+    <div class="singolo_volume">
+        <p>{{ volume.N_Volume }}</p>
+        <img id="immagine_volume_ridotta" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="Copertina {{ volume.Titolo }}">
+        <a href="/archivio/volumi/{{ volume.Titolo_Volume }}"><b>{{ volume.Titolo_Volume }}</b></a>
     </div>
     {% endfor %}
 </div>

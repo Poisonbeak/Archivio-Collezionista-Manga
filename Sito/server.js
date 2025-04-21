@@ -85,32 +85,55 @@ app.get("/archivio/manga", (req, res) => {
 
 app.get("/archivio/volumi/:titolovolume", (req, res) => {
     const titoloVolume = req.params.titolovolume;
-    console.log(titoloVolume);
+    let queryVolume;
+    // console.log(titoloVolume);
     
     pool.getConnection((err, conn) => {
         if (err) throw err;
 
-        conn.query(`SELECT V.ISBN, V.Titolo, Cop.NomeFile, Cop.Path, V.N_Pagine, V.N_Volume, M.Nome, M.Edizione
-                    FROM copertina_volume Cop INNER JOIN volume V
-                    ON Cop.NomeFile = V.Copertina
-                    INNER JOIN manga M ON V.ID_Manga = M.ID_Manga
-                    WHERE V.Titolo = '${titoloVolume}'`,
-        (error, results, fields) => {
-            console.log(results);
+        // Riv.Nome Nome_Rivenditore, Riv.Telefono, Riv.Sito_Web, RV.Prezzo, RV.Usato, RV.Qualità
+        // INNER JOIN volumi_rivenditore RV ON V.ISBN = RV.ISBN_Volume
+        // INNER JOIN rivenditore Riv ON RV.ID_Rivenditore = Riv.ID_Rivenditore
 
+        conn.query(`SELECT V.ISBN, V.Titolo, Cop.NomeFile, Cop.Path, V.N_Pagine, V.N_Volume, M.Nome Nome_Manga, M.Edizione
+                    FROM volume V INNER JOIN manga M ON V.ID_Manga = M.ID_Manga
+                    LEFT JOIN copertina_volume Cop ON V.Copertina = Cop.NomeFile
+                    WHERE V.Titolo = ?;`,
+                    [titoloVolume],
+        (error, results, fields) => {
+            // console.log(results);
+
+            queryVolume = results;
+            
+            conn.release();
+            if (error) throw error;
+        });
+        
+        conn.query(`SELECT Riv.Nome Nome_Rivenditore, Riv.Telefono, Riv.Sito_Web, RV.Prezzo, RV.Usato, RV.Qualità
+                    FROM volume V
+                    INNER JOIN volumi_rivenditore RV ON V.ISBN = RV.ISBN_Volume
+                    INNER JOIN rivenditore Riv ON RV.ID_Rivenditore = Riv.ID_Rivenditore
+                    WHERE V.Titolo = ?;`,
+                    [titoloVolume],
+        (error, results, fields) => {
+            // console.log(results);
+            
             res.status(200).render("volume.html", {
-                rows: results,
+                campiVolume: queryVolume,
+                rivenditori: results,
             })
 
             conn.release();
             if (error) throw error;
         });
+        
     })
 })
 
-app.get("/archivio/manga/:titolomanga", (req, res) => {
-    const titoloManga = req.params.titolomanga;
-    console.log(titoloManga);
+app.get("/archivio/manga/:nomemanga", (req, res) => {
+    const nomeManga = req.params.nomemanga;
+    let queryManga;
+    // console.log(nomeManga);
     
     pool.getConnection((err, conn) => {
         if (err) throw err;
@@ -123,14 +146,59 @@ app.get("/archivio/manga/:titolomanga", (req, res) => {
                     INNER JOIN autore_manga J2 ON M.ID_Manga = J2.ID_Manga
                     INNER JOIN autore AU ON J2.ID_Autore = AU.ID_Autore
                     INNER JOIN editore E ON M.Cod_Editore = E.Cod_Editore
-                    WHERE M.Nome = '${titoloManga}';`,
+                    WHERE M.Nome = ?;`,
+                    [nomeManga],
+        (error, results, fields) => {
+            // console.log(results);
+
+            queryManga = results;
+
+            conn.release();
+            if (error) throw error;
+        });
+
+        conn.query(`SELECT V.Titolo Titolo_Volume, V.N_Volume, Cop.NomeFile, Cop.Path
+                    FROM volume V LEFT JOIN copertina_volume Cop ON V.Copertina = Cop.NomeFile
+                    INNER JOIN manga M ON V.ID_Manga = M.ID_Manga
+                    WHERE M.Nome = ?;`,
+                    [nomeManga],
         (error, results, fields) => {
             console.log(results);
 
             res.status(200).render("manga.html", {
-                rows: results,
+                manga: queryManga,
+                volumi: results,
             })
+            
+            conn.release();
+            if (error) throw error;
+        });
+        
 
+    })
+})
+
+app.post("/volume", (req, res) => {
+    const nicknameUtente = req.body.nickname;
+    const titoloVolume = req.body.volume;
+
+    console.log(`${nicknameUtente} ${titoloVolume}`);
+    
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`INSERT INTO volumi_utente (Nickname_Utente, ISBN_Volume)
+                    VALUES (?, (
+                        SELECT ISBN
+                        FROM volume
+                        WHERE Titolo = ?
+                        )
+                    );`,
+                    [nicknameUtente, titoloVolume],
+        (error, results, fields) => {
+            console.log(results);
+
+            res.status(200).send("OK");
             conn.release();
             if (error) throw error;
         });
