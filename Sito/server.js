@@ -1,8 +1,12 @@
 const express = require("express");
 const path = require("path");
+const bcrypt = require("bcrypt");
 
 const app = express();
 app.use(express.static(__dirname));
+
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 app.use("/static", express.static(path.join(__dirname, "public")));
 
@@ -43,7 +47,116 @@ app.get("/", (req, res) => {
     res.status(200).render("home.html");
 })
 
+app.get("/login", (req, res) => {
+    res.status(200).render("login.html");
+})
+
+app.get("/registrazione", (req, res) => {
+    res.status(200).render("registrazione.html");
+})
+
+app.post("/registrazione", (req, res) => {
+    const {nickname, password, nome, cognome, email, data_di_nascita, città, regione} = req.body;   // DEVONO AVERE LO STESSO NOME DELLE CHIAVI
+    console.log(req.body);
+
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`SELECT Nickname, Email FROM utente WHERE Nickname = ? OR Email = ?`, [nickname, email],
+        async (error, results, fields) => {
+            if (error) throw error;
+            
+            if (results.length > 0) {
+                if (results[0].Nickname == nickname) {
+
+                    const error = "Nickname già utilizzato."
+                    res.status(400).send(JSON.stringify(error));
+
+                } else if (results[0].Email == email) {
+
+                    const error = "Email già utilizzata."
+                    res.status(400).send(JSON.stringify(error));
+
+                }
+            } else {
+                
+                const encryptedPassword = await bcrypt.hash(password, 10);
+
+                conn.query(`INSERT INTO utente (Nickname, Nome, Cognome, Data_Nascita, Città, Regione, Email, Password)
+                            VALUES (?, ?, ?, ?,
+                                (
+                                    SELECT istat FROM database_comuni.italy_cities
+                                    WHERE comune = ?
+                                ),
+                                (
+                                    SELECT id_regione FROM database_comuni.italy_regions
+                                    WHERE regione = ?
+                                ),
+                            ?, ?);`, [nickname, nome, cognome, data_di_nascita, città, regione, email, encryptedPassword],
+                (error, results, fields) => {
+                    if (error) throw error;
+                    // console.log(results);
+
+                    res.status(200).send(JSON.stringify("Registrazione avvenuta con successo!"));
+                })
+            }
+            conn.release();
+        })
+    })
+})
+
+app.post("/login", (req, res) => {
+    const nickname = req.body.nickname;
+    const insertedPassword = req.body.password;
+
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`SELECT Password FROM utente WHERE Nickname = ?`,
+            [nickname],
+            async (error, results, fields) => {
+                if (error) throw error;
+                // console.log(results);
+                
+                if (results.length > 0) {
+                    const savedPassword = results[0].Password;
+                    // console.log(savedPassword);
+    
+                    if (await bcrypt.compare(insertedPassword, savedPassword)) {
+                        conn.query(`UPDATE utente SET AccessoEffettuato = true WHERE Nickname = ?`,
+                            [nickname],
+                            (error, results, fields) => {
+                                // console.log(results);
+    
+                                res.cookie("nickname", nickname, {httpOnly: true, maxAge: 900000});
+
+                                res.status(200).send(JSON.stringify("Accesso effettuato con successo!"));
+                            }
+                        )
+                    } else {
+                        res.status(400).send(JSON.stringify("Credenziali errate. Riprova."));
+                    }
+                } else {
+                    res.status(400).send(JSON.stringify("Credenziali errate. Riprova."));
+                }
+    
+                conn.release();
+            })
+    })
+})
+
 app.get("/archivio/volumi", (req, res) => {
+    const user = req.cookies.nickname;
+    console.log(user);
+    
+    if (user === undefined) {
+
+        const error = "Occhipinti Merda";
+        res.status(401).send(JSON.stringify(error));    // CREARE PAGINA NON PERMESSI
+        return;
+
+    }
+
     pool.getConnection((err, conn) => {
         if (err) throw err;
 
@@ -52,13 +165,13 @@ app.get("/archivio/volumi", (req, res) => {
                     ON V.ID_Manga = M.ID_Manga`,
         (error, results, fields) => {
             // console.log(results);
+            if (error) throw error;
 
             res.status(200).render("archivio_volumi.html", {
                 rows: results,
             });
 
             conn.release();
-            if (error) throw error;
         })
     })
 });
@@ -72,13 +185,13 @@ app.get("/archivio/manga", (req, res) => {
                     INNER JOIN autore AU ON J1.ID_Autore = AU.ID_Autore;`,
         (error, results, fields) => {
             // console.log(results);
+            if (error) throw error;
 
             res.status(200).render("archivio_manga.html", {
                 rows: results,
             })
 
             conn.release();
-            if (error) throw error;
         });
     })
 });
@@ -101,12 +214,12 @@ app.get("/archivio/volumi/:titolovolume", (req, res) => {
                     WHERE V.Titolo = ?;`,
                     [titoloVolume],
         (error, results, fields) => {
+            if (error) throw error;
             // console.log(results);
 
             queryVolume = results;
             
             conn.release();
-            if (error) throw error;
         });
         
         conn.query(`SELECT Riv.Nome Nome_Rivenditore, Riv.Telefono, Riv.Sito_Web, RV.Prezzo, RV.Usato, RV.Qualità
@@ -116,6 +229,7 @@ app.get("/archivio/volumi/:titolovolume", (req, res) => {
                     WHERE V.Titolo = ?;`,
                     [titoloVolume],
         (error, results, fields) => {
+            if (error) throw error;
             // console.log(results);
             
             res.status(200).render("volume.html", {
@@ -124,7 +238,6 @@ app.get("/archivio/volumi/:titolovolume", (req, res) => {
             })
 
             conn.release();
-            if (error) throw error;
         });
         
     })
@@ -149,12 +262,12 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
                     WHERE M.Nome = ?;`,
                     [nomeManga],
         (error, results, fields) => {
+            if (error) throw error;
             // console.log(results);
 
             queryManga = results;
 
             conn.release();
-            if (error) throw error;
         });
 
         conn.query(`SELECT V.Titolo Titolo_Volume, V.N_Volume, Cop.NomeFile, Cop.Path
@@ -163,6 +276,7 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
                     WHERE M.Nome = ?;`,
                     [nomeManga],
         (error, results, fields) => {
+            if (error) throw error;
             console.log(results);
 
             res.status(200).render("manga.html", {
@@ -171,7 +285,6 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
             })
             
             conn.release();
-            if (error) throw error;
         });
         
 
@@ -196,11 +309,11 @@ app.post("/volume", (req, res) => {
                     );`,
                     [nicknameUtente, titoloVolume],
         (error, results, fields) => {
+            if (error) throw error;
             console.log(results);
 
             res.status(200).send("OK");
             conn.release();
-            if (error) throw error;
         });
     })
 })

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Login</h1>
+<form id="form_di_login">
+    <input type="text" name="nickname" id="input_nickname" required>
+    <input type="password" name="password" id="input_password" required>
+    <button type="button" id="bottone_invio">Accedi</button>
+</form>
+<p id="display_risposta"></p>
+<p>Non hai un account? <a href="/registrazione">Registrati</a></p>
+{% endblock %}
+
+{% block js %}
+<script src="/static/login.js"></script>
+{% endblock %}
