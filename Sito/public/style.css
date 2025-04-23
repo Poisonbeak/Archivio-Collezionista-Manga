@@ -9,7 +9,7 @@ body{
     font-size: 20px;
     background-color: #F8D6BB;
 }
-h1{
+h1, h2{
     color: #65408D;
 }
 h3{
@@ -124,4 +124,26 @@ td b{
     background-color: #D2D3E8;
     margin: 0 10px 0 10px;
     padding: 0 10px 0 10px;
+}
+
+input{
+    margin: 5px 20px 20px 20px;
+    font-size: 17px;
+    font-family: cursive;
+    border: 1px solid black;
+}
+
+input[data-autocompleted] {
+    background-color: transparent !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    transition: background-color 0s 0s, color 0s 0s;
+    transition-delay: calc(infinity * 1s);
+}
+
+button{
+    margin: 20px;
+    font-size: 20px;
 }

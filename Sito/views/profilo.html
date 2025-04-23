@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="overview_profilo">
+    {% for dati in profilo %}
+    <h1>Benvenuto, {{ dati.Nickname }}</h1>
+    <div id="info">
+        <h2>Dati personali</h2>     {# STILE GRAZIE #}
+        <ul>
+            <li><b>Nome: </b>{{ dati.Nome }}</li>
+            <li><b>Cognome: </b>{{ dati.Cognome }}</li>
+            <li><b>Data di nascita: </b>{{ dati.Data_Nascita }}</li>
+            <li><b>Città: </b>{{ dati.Città }}</li>
+            <li><b>Regione: </b>{{ dati.Regione }}</li>
+            <li><b>Email: </b>{{ dati.Email }}</li>
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

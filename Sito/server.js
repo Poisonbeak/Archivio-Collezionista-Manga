@@ -51,6 +51,46 @@ app.get("/login", (req, res) => {
     res.status(200).render("login.html");
 })
 
+app.post("/login", (req, res) => {
+    const nickname = req.body.nickname;
+    const insertedPassword = req.body.password;
+
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`SELECT Password FROM utente WHERE Nickname = ?`,
+            [nickname],
+            async (error, results, fields) => {
+                if (error) throw error;
+                // console.log(results);
+                
+                if (results.length > 0) {
+                    const savedPassword = results[0].Password;
+                    // console.log(savedPassword);
+    
+                    if (await bcrypt.compare(insertedPassword, savedPassword)) {
+                        conn.query(`UPDATE utente SET AccessoEffettuato = true WHERE Nickname = ?`,
+                            [nickname],
+                            (error, results, fields) => {
+                                // console.log(results);
+    
+                                res.cookie("nickname", nickname, {httpOnly: true, maxAge: 900000});
+
+                                res.status(200).send(JSON.stringify("Accesso effettuato con successo!"));
+                            }
+                        )
+                    } else {
+                        res.status(400).send(JSON.stringify("Credenziali errate. Riprova."));
+                    }
+                } else {
+                    res.status(400).send(JSON.stringify("Credenziali errate. Riprova."));
+                }
+    
+                conn.release();
+            })
+    })
+})
+
 app.get("/registrazione", (req, res) => {
     res.status(200).render("registrazione.html");
 })
@@ -105,58 +145,35 @@ app.post("/registrazione", (req, res) => {
     })
 })
 
-app.post("/login", (req, res) => {
-    const nickname = req.body.nickname;
-    const insertedPassword = req.body.password;
+app.get("/profilo", (req, res) => {
+    const user = req.cookies.nickname;
+    // console.log(user);
+    
+    if (user === undefined) {
+        res.status(401).render("login.html", {
+            unauthorized: "Devi effettuare il login per visualizzare questa pagina."
+        });
+        return;
+    }
 
     pool.getConnection((err, conn) => {
         if (err) throw err;
 
-        conn.query(`SELECT Password FROM utente WHERE Nickname = ?`,
-            [nickname],
-            async (error, results, fields) => {
-                if (error) throw error;
-                // console.log(results);
-                
-                if (results.length > 0) {
-                    const savedPassword = results[0].Password;
-                    // console.log(savedPassword);
-    
-                    if (await bcrypt.compare(insertedPassword, savedPassword)) {
-                        conn.query(`UPDATE utente SET AccessoEffettuato = true WHERE Nickname = ?`,
-                            [nickname],
-                            (error, results, fields) => {
-                                // console.log(results);
-    
-                                res.cookie("nickname", nickname, {httpOnly: true, maxAge: 900000});
+        conn.query(`SELECT Nickname, Nome, Cognome, Data_Nascita, Città, Regione, Email
+                    FROM utente
+                    WHERE Nickname = ?`, [user],
+        (error, results, fields) => {
+            if (error) throw error;
+            // console.log(results);
 
-                                res.status(200).send(JSON.stringify("Accesso effettuato con successo!"));
-                            }
-                        )
-                    } else {
-                        res.status(400).send(JSON.stringify("Credenziali errate. Riprova."));
-                    }
-                } else {
-                    res.status(400).send(JSON.stringify("Credenziali errate. Riprova."));
-                }
-    
-                conn.release();
-            })
+            res.status(200).render("profilo.html", {
+                profilo: results,
+            });
+        })
     })
 })
 
 app.get("/archivio/volumi", (req, res) => {
-    const user = req.cookies.nickname;
-    console.log(user);
-    
-    if (user === undefined) {
-
-        const error = "Occhipinti Merda";
-        res.status(401).send(JSON.stringify(error));    // CREARE PAGINA NON PERMESSI
-        return;
-
-    }
-
     pool.getConnection((err, conn) => {
         if (err) throw err;
 
