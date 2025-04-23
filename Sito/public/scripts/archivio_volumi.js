@@ -4,7 +4,6 @@ window.addEventListener("DOMContentLoaded", e => {
     // console.log(checkbox);
     // console.log(titoli);
     
-    
     for (let i = 0; i < checkbox.length; i++) {
         // console.log(titoli[i].innerText);
 
@@ -18,7 +17,7 @@ window.addEventListener("DOMContentLoaded", e => {
                     },
                     body: new URLSearchParams(
                         {
-                            'nickname': 'otaku_lover',
+                            'nickname': Cookies.get("nickname"),
                             'volume': titoli[i].innerText,
                         }
                     )

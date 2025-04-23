@@ -74,7 +74,7 @@ app.post("/login", (req, res) => {
                             (error, results, fields) => {
                                 // console.log(results);
     
-                                res.cookie("nickname", nickname, {httpOnly: true, maxAge: 900000});
+                                res.cookie("nickname", nickname, {httpOnly: false, maxAge: 900000});
 
                                 res.status(200).send(JSON.stringify("Accesso effettuato con successo!"));
                             }
@@ -145,7 +145,7 @@ app.post("/registrazione", (req, res) => {
     })
 })
 
-app.get("/profilo", (req, res) => {
+app.get("/profilo", (req, res) => {     // possibilità di modificare i dati del profilo?
     const user = req.cookies.nickname;
     // console.log(user);
     
@@ -159,9 +159,11 @@ app.get("/profilo", (req, res) => {
     pool.getConnection((err, conn) => {
         if (err) throw err;
 
-        conn.query(`SELECT Nickname, Nome, Cognome, Data_Nascita, Città, Regione, Email
-                    FROM utente
-                    WHERE Nickname = ?`, [user],
+        conn.query(`SELECT U.Nickname, U.Nome, U.Cognome, U.Data_Nascita, C.comune, R.regione, U.Email
+                    FROM utente U
+                    INNER JOIN database_comuni.italy_cities C ON U.Città = C.istat 
+                    INNER JOIN database_comuni.italy_regions R ON U.Regione = R.id_regione
+                    WHERE U.Nickname = ?`, [user],
         (error, results, fields) => {
             if (error) throw error;
             // console.log(results);
@@ -173,7 +175,7 @@ app.get("/profilo", (req, res) => {
     })
 })
 
-app.get("/archivio/volumi", (req, res) => {
+app.get("/archivio/volumi", (req, res) => {     // LE CHECKBOX NON SPUNTANO SENZA LOGIN
     pool.getConnection((err, conn) => {
         if (err) throw err;
 

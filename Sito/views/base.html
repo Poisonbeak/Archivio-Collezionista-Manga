@@ -6,6 +6,7 @@
     {% block css %}
     <link rel="stylesheet" type="text/css" href="/static/style.css">
     {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
     <title>The Manga Shelf - Collezione di Manga</title>
 </head>
 <body>
@@ -15,16 +16,16 @@
             <a href="/">Home</a>
         </div>
         <div>
-            <a href="">La mia collezione</a>
+            <a href="/archivio/volumi">Archivio</a>
         </div>
         <div>
-            <a href="/archivio/volumi">Archivio</a>
+            <a href="">La mia collezione</a>
         </div>
         <div>
             <a href="/profilo">Profilo</a>
         </div>
         <div>
-            <a href="/login">Login</a>
+            <a href="/login">Log-in</a>
         </div>
         {% endblock %}
     </div>
@@ -40,8 +41,8 @@
         <div id="footer_left">
             <h3>NAVIGAZIONE</h3>
             <a href="/">Home</a>
-            <a href="">La mia collezione</a>
             <a href="/archivio/volumi">Archivio</a>
+            <a href="">La mia collezione</a>
             <a href="/profilo">Profilo</a>
             <a href="/login">Login</a>
         </div>
