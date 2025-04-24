@@ -101,8 +101,10 @@ td b{
 #immagine_volume{
     width: 300px;
 }
-#immagine_volume_ridotta{
+.immagine_volume_ridotta{
+    display: block;
     width: 120px;
+    margin-bottom: 10px;
 }
 #info{
     margin-top: 30px;
@@ -115,7 +117,7 @@ td b{
     flex-grow: 1;
 }
 
-#lista_volumi_manga{
+.lista_volumi_manga{
     display: flex;
     overflow: auto;
 }
@@ -123,7 +125,7 @@ td b{
     border: 2px solid #65408D;
     background-color: #D2D3E8;
     margin: 0 10px 0 10px;
-    padding: 0 10px 0 10px;
+    padding: 0 10px 10px 10px;
 }
 
 input{
@@ -144,6 +146,9 @@ button{
     margin: 20px;
     font-size: 20px;
 }
+input[type="checkbox"]{
+    margin: 0;
+}
 
 ul{
     padding-left: 0;
@@ -152,3 +157,13 @@ li{
     text-align: center;
     list-style-type: none;
 }
+
+.raccoglitore_manga .lista_volumi_manga{
+    display: none;
+}
+
+.raccoglitore_manga h2:hover + .lista_volumi_manga{
+    display: flex;
+}
+
+/* .raccoglitore_manga:hover + .lista_volumi_manga  */

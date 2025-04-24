@@ -1,14 +1,30 @@
 window.addEventListener("DOMContentLoaded", e => {
     const checkbox = document.getElementsByClassName("checkboxPosseduto");
     const titoli = document.getElementsByClassName("titolo_volume");
-    // console.log(checkbox);
-    // console.log(titoli);
     
-    for (let i = 0; i < checkbox.length; i++) {
-        // console.log(titoli[i].innerText);
+    fetch("http://localhost:5000/controlloVolumiPosseduti")
+    .then(response => response.json())
+    .then(message => {
+        let titoliPosseduti = message;
+        console.log(titoliPosseduti);
+        
+        for (let i = 0; i < titoliPosseduti.length; i++) {      // efficienza bruttissima (esponenziale mado)
+            for (let j = 0; j < checkbox.length; j++) {
+                if (titoliPosseduti[i].Titolo == titoli[j].innerText) {
+                    checkbox[j].checked = true;
+                    continue;
+                }
+            }
+        }
+    })
+    .catch(err => {
+        console.error(err.message);
+    });
 
+    for (let i = 0; i < checkbox.length; i++) {
         checkbox[i].addEventListener("change", e => {
             
+            // se l'utente mette la spunta, aggiunge il volume alla collezione; se la toglie, lo rimuove
             if (checkbox[i].checked) {
                 fetch("http://localhost:5000/volume", {
                     method: 'POST',
@@ -17,38 +33,39 @@ window.addEventListener("DOMContentLoaded", e => {
                     },
                     body: new URLSearchParams(
                         {
-                            'nickname': Cookies.get("nickname"),
+                            'nickname': Cookies.get("nickname"),    // altro possibile problema di sicurezza, mi sa. Certo che ne siamo pieni...
                             'volume': titoli[i].innerText,
                         }
                     )
                 })
+                .then(response => response.text())
                 .then(message => {
-                    alert("Aggiunto con successo!");
+                    alert(message);
                 })
                 .catch(err => {
                     console.error(err.message);
                 });
 
             } else {
-                
-                // fetch("http://localhost:5000/volume", {
-                //     method: 'DELETE',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: new URLSearchParams(
-                //         {
-                //             'nickname': 'otaku_lover',
-                //             'volume': titoli[i].innerText,
-                //         }
-                //     )
-                // })
-                // .then(message => {
-                //     alert("Rimosso con successo!");
-                // })
-                // .catch(err => {
-                //     console.error(err.message);
-                // }); 
+                fetch("http://localhost:5000/volume", {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(
+                        {
+                            'nickname': Cookies.get("nickname"),
+                            'volume': titoli[i].innerText,
+                        }
+                    )
+                })
+                .then(response => response.text())
+                .then(message => {
+                    alert(message);
+                })
+                .catch(err => {
+                    console.error(err.message);
+                }); 
             }
 
         })

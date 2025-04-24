@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Collezione</h1>
+<div id="collezione">
+    {% for manga in mangaPosseduti %}
+        <div class="raccoglitore_manga">
+            <h2><a href="/archivio/manga/{{ manga.Nome }}">{{ manga.Nome }}</a></h2>
+            <div class="lista_volumi_manga">
+                {% for volume in volumiPosseduti %}
+                    {% if (volume.Nome_Manga == manga.Nome) %}
+                        <div class="singolo_volume">
+                            <p>{{ volume.N_Volume }}</p>
+                            <img class="immagine_volume_ridotta" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="Copertina {{ volume.Titolo }}">
+                            <a href="/archivio/volumi/{{ volume.Titolo }}"><b>{{ volume.Titolo }}</b></a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

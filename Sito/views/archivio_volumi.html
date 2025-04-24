@@ -9,7 +9,9 @@
             <th>Numero pagine</th>
             <th>Manga</th>
             <th>Edizione</th>
+            {% if (logged) %}
             <th>Posseduto</th>
+            {% endif %}
         </tr>
         {% for row in rows %}
         <tr>
@@ -17,15 +19,17 @@
             <td> {{ row.N_Pagine }}</td>
             <td> {{ row.Nome }}</td>
             <td> {{ row.Edizione }}</td>
+            {% if (logged) %}
             <td>
                 <input class="checkboxPosseduto" type="checkbox">
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>
 </div>
 {% endblock %}
 
-{% block js %}
+{% block js %} {% if (logged) %}
 <script src="/static/scripts/archivio_volumi.js"></script>
-{% endblock %}
+{% endif %} {% endblock %}

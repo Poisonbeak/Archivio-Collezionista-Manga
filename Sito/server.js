@@ -149,7 +149,7 @@ app.get("/profilo", (req, res) => {     // possibilità di modificare i dati del
     const user = req.cookies.nickname;
     // console.log(user);
     
-    if (user === undefined) {
+    if (!user) {
         res.status(401).render("login.html", {
             unauthorized: "Devi effettuare il login per visualizzare questa pagina."
         });
@@ -175,7 +175,10 @@ app.get("/profilo", (req, res) => {     // possibilità di modificare i dati del
     })
 })
 
-app.get("/archivio/volumi", (req, res) => {     // LE CHECKBOX NON SPUNTANO SENZA LOGIN
+app.get("/archivio/volumi", (req, res) => {
+    const user = req.cookies.nickname;
+    // console.log(user);
+    
     pool.getConnection((err, conn) => {
         if (err) throw err;
 
@@ -186,11 +189,23 @@ app.get("/archivio/volumi", (req, res) => {     // LE CHECKBOX NON SPUNTANO SENZ
             // console.log(results);
             if (error) throw error;
 
-            res.status(200).render("archivio_volumi.html", {
-                rows: results,
-            });
+            if (!user) {
+                res.status(200).render("archivio_volumi.html", {
+                    rows: results,
+                    logged: 0,
+                });
 
-            conn.release();
+                conn.release();
+                return;
+            } else {
+                res.status(200).render("archivio_volumi.html", {
+                    rows: results,
+                    logged: 1,
+                });
+
+                conn.release();
+                return;
+            }
         })
     })
 });
@@ -296,7 +311,7 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
                     [nomeManga],
         (error, results, fields) => {
             if (error) throw error;
-            console.log(results);
+            // console.log(results);
 
             res.status(200).render("manga.html", {
                 manga: queryManga,
@@ -307,6 +322,74 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
         });
         
 
+    })
+})
+
+app.get("/controlloVolumiPosseduti", (req, res) => {
+    const user = req.cookies.nickname;
+    // console.log(user);
+
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`SELECT V.Titolo
+                    FROM volumi_utente VU INNER JOIN volume V ON VU.ISBN_Volume = V.ISBN
+                    WHERE VU.Nickname_Utente = ?`, [user],
+        (error, results, fields) => {
+            if (error) throw error;
+            // console.log(results);
+
+            res.status(200).send(results);
+        })
+    })
+})
+
+app.get("/collezione", (req, res) => {
+    const user = req.cookies.nickname;
+    // console.log(user);
+    
+    if (!user) {
+        res.status(401).render("login.html", {
+            unauthorized: "Devi effettuare il login per visualizzare questa pagina."
+        });
+        return;
+    }
+
+    let volumi = [];
+
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`SELECT V.Titolo, M.Nome Nome_Manga, V.N_Volume, C.NomeFile, C.Path
+                    FROM manga M
+                    INNER JOIN volume V ON M.ID_Manga = V.ID_Manga
+                    LEFT JOIN copertina_volume C ON V.Copertina = C.NomeFile
+                    INNER JOIN volumi_utente VU ON V.ISBN = VU.ISBN_Volume
+                    WHERE VU.Nickname_Utente = ?
+                    ORDER BY M.Nome ASC, V.N_Volume ASC`, [user],
+        (error, results, fields) => {
+            if (error) throw error;
+            console.log(results);
+    
+            volumi = results;
+        })
+
+        conn.query(`SELECT DISTINCT M.Nome FROM manga M
+                    INNER JOIN volume V ON M.ID_Manga = V.ID_Manga
+                    INNER JOIN volumi_utente VU ON V.ISBN = VU.ISBN_Volume
+                    WHERE VU.Nickname_Utente = ?
+                    ORDER BY M.Nome ASC`, [user],
+        (error, results, fields) => {
+            if (error) throw error;
+            console.log(results);
+
+            let manga = results;
+
+            res.status(200).render("collezione.html", {
+                volumiPosseduti: volumi,
+                mangaPosseduti: manga,
+            })
+        })
     })
 })
 
@@ -329,9 +412,35 @@ app.post("/volume", (req, res) => {
                     [nicknameUtente, titoloVolume],
         (error, results, fields) => {
             if (error) throw error;
-            console.log(results);
+            // console.log(results);
 
-            res.status(200).send("OK");
+            res.status(201).send("Aggiunto con successo!");
+            conn.release();
+        });
+    })
+})
+
+app.delete("/volume", (req, res) => {
+    const nicknameUtente = req.body.nickname;
+    const titoloVolume = req.body.volume;
+
+    console.log(`${nicknameUtente} ${titoloVolume}`);
+    
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`DELETE FROM volumi_utente
+                    WHERE Nickname_Utente = ? AND ISBN_Volume = (
+                        SELECT ISBN
+                        FROM volume
+                        WHERE Titolo = ?
+                        )`,
+                    [nicknameUtente, titoloVolume],
+        (error, results, fields) => {
+            if (error) throw error;
+            // console.log(results);
+
+            res.status(200).send(JSON.stringify("Rimosso con successo!"));
             conn.release();
         });
     })

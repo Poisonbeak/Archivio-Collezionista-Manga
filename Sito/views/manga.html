@@ -27,11 +27,11 @@
 </div>
 
 <h1>Volumi</h1>
-<div id="lista_volumi_manga">
+<div class="lista_volumi_manga">
     {% for volume in volumi %}
     <div class="singolo_volume">
         <p>{{ volume.N_Volume }}</p>
-        <img id="immagine_volume_ridotta" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="Copertina {{ volume.Titolo }}">
+        <img class="immagine_volume_ridotta" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="Copertina {{ volume.Titolo }}">
         <a href="/archivio/volumi/{{ volume.Titolo_Volume }}"><b>{{ volume.Titolo_Volume }}</b></a>
     </div>
     {% endfor %}
