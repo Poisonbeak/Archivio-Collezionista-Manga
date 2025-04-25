@@ -218,8 +218,8 @@ app.get("/archivio/manga", (req, res) => {
         if (err) throw err;
 
         conn.query(`SELECT M.Nome Nome_Manga, M.Edizione, AU.Nome Nome_Autore, AU.Cognome Cognome_Autore
-                    FROM Manga M INNER JOIN autore_manga J1 ON M.ID_Manga = J1.ID_Manga
-                    INNER JOIN autore AU ON J1.ID_Autore = AU.ID_Autore;`,
+                    FROM Manga M LEFT JOIN autore_manga J1 ON M.ID_Manga = J1.ID_Manga
+                    LEFT JOIN autore AU ON J1.ID_Autore = AU.ID_Autore;`,
         (error, results) => {
             // console.log(results);
             if (error) throw error;
