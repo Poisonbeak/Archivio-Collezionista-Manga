@@ -1,24 +1,43 @@
 {% extends "base.html" %}
 
+{% block css %}
+<link rel="stylesheet" href="/static/styles/home.css">
+{% endblock %}
+
 {% block content %}
-<p>
-    Priorità 1: Introduzione con obiettivo del sito e funzionalità<br>
-    Quando si parla di archivio manga -> esempi di link consultabili per:
-    Dragonball, Big Three (One Piece, Naruto, Bleach) <br>
-    Piccole nozioni base per collezionisti (cosa sono Shonen, Shoujo, Seinen, chicche sulla cultura asiatica) <br>
-    "Raccoglili tutti!" <br>
-
-    Priorità 2: Logout <br>
-
-    Priorità 3: inserisci le copertine dei manga (copertina_volume -> copertina, relazione con entità manga)
-    aggiungile poi alla pagina di presentazione dei singoli manga e nelle collezioni <br>
-
-    Priorità 4: possibilità di modificare i dati del profilo da loggato <br>
-
-    Priorità 5: ricerca volumi e manga specifici <br>
-
-    Priorità 6: aggiungi tutti i volumi di un manga sempre con spunta nell'archivio (se si possiedono già alcuni volumi, solo quelli mancanti) <br>
-
-    Priorità 7: errori server dettagliati <br>
-</p>
+<div id="contenuti">
+    <div id="introduzione">
+        <p>Benvenuto a "The Manga Shelf"! Questo sito è il posto perfetto per ogni intenditore e collezionista di manga giapponesi.</p>
+        <p>Le funzionalità principali che offre sono la consultazione di un archivio di volumi e dei rispettivi manga, e la gestione della propria collezione personale.</p>
+        <p>È consigliabile <a href="/registrazione">registrarsi</a> per accedere a tutte le funzionalità del sito.</p>
+        <p>Attraverso la pagina "<a href="/archivio/volumi">Archivio</a>", puoi vedere tutti i volumi di manga pubblicati e i manga stessi. Permette inoltre di selezionare dei volumi per aggiungerli alla propria collezione.</p>
+        <p>Da "<a href="/collezione">La mia collezione</a>" puoi vedere quali volumi possiedi e a che manga appartengono, mentre da "<a href="/profilo">Profilo</a>" puoi visualizzare le tue informazioni personali.</p>
+    </div>
+    <div>
+        <p>Per esempio, conosci <a href="/archivio/manga/Naruto">Naruto</a>? Scritto da Masashi Kishimoto, è un manga d'azione e avventura dove i personaggi lottano usando techinche ninja e magie elementali</p>
+        <p>Naruto fa parte dei "Big Three", ovvero i tre manga più conosciuti e rinomati. Gli altri due sono <a href="/archivio/manga/Bleach">Bleach</a> e <a href="/archivio/manga/One Piece">One Piece</a>
+        <p>Il primo parla di un ragazzo con il potere di vedere gli spiriti che diventa uno Shinigami, una sorta di "dio della morte", e delle sue vicende con la Soul Society, il mondo degli spiriti.</p>
+        <p>Il secondo tratta del viaggio di un giovane pirata, Luffy, alla ricerca del One Piece, il leggendario tesoro che permette di diventare il Re dei Pirati. Affronterà importanti avventure assieme alla sua ciurma, la "Cappello di Paglia"</p>
+    </div>
+    <div>
+        <p>Se stai iniziando a collezionare manga da poco, eccoti delle informazioni che ti potrebbere essere molto utili:</p>
+        <p>Alcuni generi molto popolari di manga sono Shonen, Shoujo, Seinen e Josei.</p>
+        <p>I primi due significano rispettivamente "ragazzo giovane" e "ragazza giovane", e sono indicati per giovani dai 12 ai 18 anni.
+            Quelli per i ragazzi hanno protagonisti giovani e conflitti per diventare più forti, mentre quelli per le ragazze trattano storie d'amore e le emozioni dei personaggi in dettaglio.</p>
+        <p>Gli ultimi due invece sono per uomini e donne dai 18 anni in su. Entrambi trattano temi più seri come la politica e la psicologia, e i personaggi all'interno sono più maturi.</p>
+    </div>
+    <div>
+        <p>Leggere un manga non è solo utile per passare il tempo, ma si può anche imparare! Molte storie infatti contengono chicche e riferimenti alla cultura asiatica.</p>
+        <p>Alcune tecniche ninja di Naruto si ispirano a vere tecniche, come il "Kage Bunshin no Jutsu", il "Clone d'Ombra".
+            Inoltre, la società ricca di clan mostrata nella storia rispecchia la struttura sociale giapponese, che valuta molto i legami familiari.</p>
+        <p>Passando a Bleach, la concezione della vita dopo la morte affonda le sue radici nello Shintoismo giapponese. La morte infatti non è una fine, ma un passaggio ad un mondo differente attraverso lo spirito.
+            Lo Shinigami, perdipiù, è una divinità (kami) della cultura giapponese che ha il compito di guidare le anime nell'oltretomba.
+        </p>
+    </div>
+    <div>
+        <p>Spero che questo sito ti sia utile per segnare i manga che possiedi e scoprirne di nuovi.</p>
+        <p>In ogni caso, ti invitiamo a raccoglierli tutti! Buon proseguimento!</p>
+    </div>
+    <sub>Questo sito è stato sviluppato per un progetto scolastico di quinto anno all'ITET Da VInci Milazzo. Usa HTML/CSS/JS lato client, e Node JS con Express, Nunjucks e MySql lato server.</sub>
+</div>
 {% endblock %}

@@ -308,12 +308,11 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
         const mangaPromise = new Promise((resolve, reject) => {
             conn.query(`SELECT M.ID_Manga, M.Nome Nome_Manga, M.Edizione, M.A_Colori, M.Contenuti_Extra,
                         AU.Nome Nome_Autore, AU.Cognome Cognome_Autore, AU.Pseudonimo Pseudonimo_Autore, AR.Nome Nome_Artista, AR.Cognome Cognome_Artista, AR.Pseudonimo Pseudonimo_Artista, E.Nome Nome_Editore
-                        FROM manga M INNER JOIN artista_manga J1
-                        ON M.ID_Manga = J1.ID_Manga
-                        INNER JOIN artista AR ON J1.ID_Artista = AR.ID_Artista
-                        INNER JOIN autore_manga J2 ON M.ID_Manga = J2.ID_Manga
-                        INNER JOIN autore AU ON J2.ID_Autore = AU.ID_Autore
-                        INNER JOIN editore E ON M.Cod_Editore = E.Cod_Editore
+                        FROM manga M LEFT JOIN artista_manga J1 ON M.ID_Manga = J1.ID_Manga
+                        LEFT JOIN artista AR ON J1.ID_Artista = AR.ID_Artista
+                        LEFT JOIN autore_manga J2 ON M.ID_Manga = J2.ID_Manga
+                        LEFT JOIN autore AU ON J2.ID_Autore = AU.ID_Autore
+                        LEFT JOIN editore E ON M.Cod_Editore = E.Cod_Editore
                         WHERE M.Nome = ?;`,
                         [nomeManga],
             (error, results) => {
