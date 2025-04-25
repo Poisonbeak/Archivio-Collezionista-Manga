@@ -1,0 +1,43 @@
+.lista_volumi_manga{
+    display: none;
+    align-items: center;
+    overflow: auto;
+}
+.singolo_volume{
+    display: grid;
+    margin: 10px 10px 10px 10px;
+    padding: 0 10px 10px 10px;
+
+    border: 2px solid #65408D;
+    background-color: #D2D3E8;
+}
+.singolo_volume > *{
+    flex: 1;
+}
+#collezione{
+    display: grid;
+    height: 700px;
+}
+#scaffale{
+    display: flex;
+    align-items: flex-end;
+    overflow: auto;
+
+    height: 200px;
+    border-bottom: 10px solid #9F5E5C;
+    border-radius: 10px;
+}
+.raccoglitore_manga{
+    display: flex;
+
+    height: 150px;
+    margin: 0 10px 5px 10px;
+    padding: 0 15px 0 15px;
+
+    background-color: #D2D3E8;
+    border: 3px solid #9F5E5C;
+    border-radius: 15px;
+}
+.raccoglitore_manga h2{
+    margin: auto 0 auto 0;
+}

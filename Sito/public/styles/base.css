@@ -124,7 +124,7 @@ td b{
 .singolo_volume{
     border: 2px solid #65408D;
     background-color: #D2D3E8;
-    margin: 0 10px 0 10px;
+    margin: 10px 10px 10px 10px;
     padding: 0 10px 10px 10px;
 }
 
@@ -157,13 +157,3 @@ li{
     text-align: center;
     list-style-type: none;
 }
-
-.raccoglitore_manga .lista_volumi_manga{
-    display: none;
-}
-
-.raccoglitore_manga h2:hover + .lista_volumi_manga{
-    display: flex;
-}
-
-/* .raccoglitore_manga:hover + .lista_volumi_manga  */
