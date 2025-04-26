@@ -1,68 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" type="text/css" href="/static/styles/base.css">
-    {% block css %}
-    {% endblock %}
-
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    <title>The Manga Shelf - Collezione di Manga</title>
-    
-</head>
-<body>
-    <div id="header">
-        {% block header %}
-        <div>
-            <a href="/">Home</a>
-        </div>
-        <div>
-            <a href="/archivio/volumi">Archivio</a>
-        </div>
-        <div>
-            <a href="/collezione">La mia collezione</a>
-        </div>
-        <div>
-            <a href="/profilo">Profilo</a>
-        </div>
-        <div>
-            <a href="/login">Log-in</a>
-        </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" type="text/css" href="/static/styles/base.css">
+        {% block css %}
         {% endblock %}
-    </div>
-
-    <div id="main">
-        {% block content %}
-        <p>Ciao</p>
-        {% endblock %}
-    </div>
-
-    <div id="footer">
-        {% block footer %}
-        <div id="footer_left">
-            <h3>NAVIGAZIONE</h3>
-            <a href="/">Home</a>
-            <a href="/archivio/volumi">Archivio</a>
-            <a href="/collezione">La mia collezione</a>
-            <a href="/profilo">Profilo</a>
-            <a href="/login">Login</a>
-        </div>
-        <div id="footer_right">
+        
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+        <title>The Manga Shelf - Collezione di Manga</title>
+        
+    </head>
+    <body>
+        <div id="header">
+            {% block header %}
             <div>
-                <h3>LINK UTILI</h3>
-                <a href="">Privacy Policy</a>
-                <a href="">Termini e Condizioni</a>
-                <a href="">Trattamento dei dati personali</a>
+                <a href="/">Home</a>
             </div>
-            <div id="copyright">
-                <p>&copy; Alfano Michele, Paolini Francesco, Occhipinti Riccardo Giovanni</p>
+            <div>
+                <a href="/archivio/volumi">Archivio</a>
             </div>
+            <div>
+                <a href="/collezione">La mia collezione</a>
+            </div>
+            <div>
+                <a href="/profilo">Profilo</a>
+            </div>
+            <div>
+                {% if (logged) %} <a href="/logout">Log-out</a>
+                {% else %} <a href="/login">Log-in</a> {% endif %}
+            </div>
+            {% endblock %}
         </div>
-        {% endblock %}
-    </div>
-</body>
+        
+        <div id="main">
+            {% block content %}
+            <p>Ciao</p>
+            {% endblock %}
+        </div>
+        
+        <div id="footer">
+            {% block footer %}
+            <div id="footer_left">
+                <h3>NAVIGAZIONE</h3>
+                <a href="/">Home</a>
+                <a href="/archivio/volumi">Archivio</a>
+                <a href="/collezione">La mia collezione</a>
+                <a href="/profilo">Profilo</a>
+                {% if (logged) %} <a href="/logout">Log-out</a>
+                {% else %} <a href="/login">Log-in</a> {% endif %}
+            </div>
+            <div id="footer_right">
+                <div>
+                    <h3>LINK UTILI</h3>
+                    <a href="">Privacy Policy</a>
+                    <a href="">Termini e Condizioni</a>
+                    <a href="">Trattamento dei dati personali</a>
+                </div>
+                <div id="copyright">
+                    <p>&copy; Alfano Michele, Paolini Francesco, Occhipinti Riccardo Giovanni</p>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </body>
+
+<!-- <script src="/static/scripts/base.js"></script> -->
 {% block js %}
 {% endblock %}
 </html>

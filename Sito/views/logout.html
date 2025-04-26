@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Logout</h1>
+<h3>Sei sicuro di voler uscire dal tuo account?</h3>
+<p><a id="logout">Esci dal mio account</a></p>
+<p id="display_risposta">{{ message }}</p>
+
+{% endblock %}
+
+{% block js %}
+<script src="/static/scripts/logout.js"></script>
+{% endblock %}
