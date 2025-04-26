@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block css %}
+<link rel="stylesheet" href="/static/styles/profilo.css">
+{% endblock %}
+
 {% block content %}
 <div>
     {% for dati in profilo %}
@@ -16,6 +20,7 @@
         </ul>
     </div>
     {% endfor %}
+    <a href="/profilo/modifica"><p id="link_modifica">Modifica i dati</p></a>
 </div>
 {% endblock %}
 

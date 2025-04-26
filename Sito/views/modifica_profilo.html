@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/styles/login_registrazione.css">
+{% endblock %}
+
+{% block content %}
+<h1>Registrazione</h1>
+<form id="form_registrazione">
+    {% for dati in profilo %}
+    <div>
+        <label for="nickname">Nickname:</label><br>
+        <input type="text" name="nickname" id="input_nickname" value="{{ dati.Nickname }}" required>
+    </div>
+    <div>
+        <label for="nome">Nome:</label><br>
+        <input type="text" name="nome" value="{{ dati.Nome }}" required>
+    </div>
+    <div>
+        <label for="cognome">Cognome:</label><br>
+        <input type="text" name="cognome" value="{{ dati.Cognome }}" required>
+    </div>
+    <div>
+        <label for="email">Email:</label><br>
+        <input type="email" name="email" value="{{ dati.Email }}" required>
+    </div>
+    <div>
+        <label for="data_di_nascita">Data di nascita:</label><br>
+        <input type="date" name="data_di_nascita" value="{{ dati.Data_Nascita }}" required>
+    </div>
+    <div> 
+        <label for="città">Città:</label><br>
+        <input type="text" name="città" value="{{ dati.comune }}" required>
+    </div>
+    <div>
+        <label for="regione">Regione:</label><br>
+        <input type="text" name="regione" value="{{ dati.regione }}" required>
+    </div>
+    {% endfor %}
+    <button type="button" id="bottone_invio">Conferma modifiche</button>
+</form>
+<p id="display_risposta"></p>
+{% endblock %}
+
+{% block js %}
+<script src="/static/scripts/modifica_profilo.js"></script>
+{% endblock %}

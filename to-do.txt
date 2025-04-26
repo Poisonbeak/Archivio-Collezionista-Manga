@@ -1,11 +1,8 @@
 |
 V
-
-possibilità di modificare i dati del profilo da loggato
-
 controllo sui form
 
-elimina da collezione
+tutti i volumi di un manga dalla collezione, quelli che possiedi sotto hanno il tasto "elimina" , quelli che non possiedi sono grigi e hanno il tasto "aggiungi"
 
 ricerca volumi e manga specifici
 

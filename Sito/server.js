@@ -34,7 +34,6 @@ const pool = mysql.createPool({
   });
 
 const nunjucks = require('nunjucks');
-const { error } = require("console");
 app.set("view engine", "html");
 nunjucks.configure(__dirname + "/views", {
     autoescape: true,
@@ -167,41 +166,33 @@ app.post("/registrazione", (req, res) => {
             if (error) throw error;
             
             if (results.length > 0) {
-                if (results[0].Nickname == nickname) {
-
-                    const error = "Nickname già utilizzato."
-                    res.status(400).send(JSON.stringify(error));
-
-                } else if (results[0].Email == email) {
-
-                    const error = "Email già utilizzata."
-                    res.status(400).send(JSON.stringify(error));
-
-                }
-            } else {
-                
-                const encryptedPassword = await bcrypt.hash(password, 10);
-
-                conn.query(`INSERT INTO utente (Nickname, Nome, Cognome, Data_Nascita, Città, Regione, Email, Password)
-                            VALUES (?, ?, ?, ?,
-                                (
-                                    SELECT istat FROM database_comuni.italy_cities
-                                    WHERE comune = ?
-                                ),
-                                (
-                                    SELECT id_regione FROM database_comuni.italy_regions
-                                    WHERE regione = ?
-                                ),
-                            ?, ?);`, [nickname, nome, cognome, data_di_nascita, città, regione, email, encryptedPassword],
-                (error, results) => {
-                    if (error) throw error;
-                    // console.log(results);
-
-                    res.status(200).send(JSON.stringify("Registrazione avvenuta con successo!"));
-                })
+                messaggio = "Nickname o Email già in uso da un altro utente.";
+                conn.release();
+                return res.status(409).send(JSON.stringify(messaggio));
             }
-            console.log('Connessione rilasciata:', conn.threadId);
-            conn.release();
+
+            const encryptedPassword = await bcrypt.hash(password, 10);
+
+            conn.query(`INSERT INTO utente (Nickname, Nome, Cognome, Data_Nascita, Città, Regione, Email, Password)
+                        VALUES (?, ?, ?, ?,
+                            (
+                                SELECT istat FROM database_comuni.italy_cities
+                                WHERE comune = ?
+                            ),
+                            (
+                                SELECT id_regione FROM database_comuni.italy_regions
+                                WHERE regione = ?
+                            ),
+                        ?, ?);`, [nickname, nome, cognome, data_di_nascita, città, regione, email, encryptedPassword],
+            (error, results) => {
+                if (error) throw error;
+                // console.log(results);
+
+                res.status(200).send(JSON.stringify("Registrazione avvenuta con successo!"));
+                
+                console.log('Connessione rilasciata:', conn.threadId);
+                conn.release();
+            })
         })
     })
 })
@@ -237,6 +228,98 @@ app.get("/profilo", (req, res) => {     // possibilità di modificare i dati del
             conn.release();
         })
     })
+})
+
+app.get("/profilo/modifica", (req, res) => {
+    const user = req.cookies.nickname;
+
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`SELECT U.Nickname, U.Password, U.Nome, U.Cognome, U.Data_Nascita, C.comune, R.regione, U.Email
+                    FROM utente U
+                    INNER JOIN database_comuni.italy_cities C ON U.Città = C.istat 
+                    INNER JOIN database_comuni.italy_regions R ON U.Regione = R.id_regione
+                    WHERE U.Nickname = ?`, [user],
+            (error, results) => {
+                if (error) throw error;
+
+                if (!results || results.length === 0) {
+                    conn.release();
+                    return res.status(404).send("Utente non trovato.");
+                }
+
+                const data = new Date(results[0].Data_Nascita);
+
+                const anno = data.getFullYear();                            // formatta a yyyy-mm-dd richesto dall'input lato client
+                const mese = String(data.getMonth() + 1).padStart(2, '0');
+                const giorno = String(data.getDate()).padStart(2, '0'); 
+
+                results[0].Data_Nascita = `${anno}-${mese}-${giorno}`;
+
+                res.status(200).render("modifica_profilo.html", {
+                    profilo: results,
+                    logged: (!user) ? 0 : 1,
+                })
+                
+                console.log('Connessione rilasciata:', conn.threadId);
+                conn.release();
+            })
+    })
+
+})
+
+app.post("/profilo/modifica", (req, res) => {
+    const {nickname, nome, cognome, email, data_di_nascita, città, regione, nicknameOriginale, emailOriginale} = req.body;
+    
+    pool.getConnection((err, conn) => {
+        if (err) {
+          return res.status(500).send("Errore nella connessione al database.");
+        }
+      
+        conn.query(`SELECT * FROM utente
+                    WHERE (Nickname = ? OR Email = ?)
+                    AND Nickname != ?;`, [nickname, email, nicknameOriginale],
+            (err, results) => {
+                if (err) throw err;
+            
+                if (results.length > 0) {
+                    messaggio = "Nickname o Email già in uso da un altro utente.";
+                    conn.release();
+                    res.status(409).send(JSON.stringify(messaggio));
+                }
+            });
+        
+        conn.query(`UPDATE utente
+                    SET Nickname = ?,
+                        Nome = ?,
+                        Cognome = ?,
+                        Data_Nascita = ?,
+                        Città = (
+                        SELECT istat FROM database_comuni.italy_cities WHERE comune = ? LIMIT 1
+                        ),
+                        Regione = (
+                        SELECT id_regione FROM database_comuni.italy_regions WHERE regione = ? LIMIT 1
+                        ),
+                        Email = ?
+                    WHERE Nickname = ?;`,
+                    [nickname, nome, cognome, data_di_nascita, città, regione, email, nicknameOriginale],
+            (err, result) => {
+            conn.release();
+    
+            if (err) throw err;
+    
+            if (result.affectedRows === 0) {
+                messaggio = "Nessuna modifica effettuata";
+                res.status(200).send(JSON.stringify(messaggio));
+            }
+
+            res.cookie("nickname", nickname, {httpOnly: false});
+    
+            messaggio = "Modifiche salvate con successo!";
+            return res.status(200).send(JSON.stringify(messaggio));
+        });
+    });  
 })
 
 app.get("/archivio/volumi", (req, res) => {

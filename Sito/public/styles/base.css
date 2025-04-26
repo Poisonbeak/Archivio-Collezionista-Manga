@@ -108,4 +108,6 @@ ul{
 li{
     text-align: center;
     list-style-type: none;
+
+    margin-bottom: 15px;
 }
