@@ -18,6 +18,9 @@
         <p>Naruto fa parte dei "Big Three", ovvero i tre manga più conosciuti e rinomati. Gli altri due sono <a href="/archivio/manga/Bleach">Bleach</a> e <a href="/archivio/manga/One Piece">One Piece</a>
         <p>Il primo parla di un ragazzo con il potere di vedere gli spiriti che diventa uno Shinigami, una sorta di "dio della morte", e delle sue vicende con la Soul Society, il mondo degli spiriti.</p>
         <p>Il secondo tratta del viaggio di un giovane pirata, Luffy, alla ricerca del One Piece, il leggendario tesoro che permette di diventare il Re dei Pirati. Affronterà importanti avventure assieme alla sua ciurma, la "Cappello di Paglia"</p>
+        {% for img in bigThreeImages %}
+        <a href="/archivio/manga/{{ img.Nome_Manga}}"><img class="immagine" src="{{ img.Path }}/{{ img.NomeFile }}" alt="Copertina {{ img.Nome_Manga }}"></a>
+        {% endfor %}
     </div>
     <div>
         <p>Se stai iniziando a collezionare manga da poco, eccoti delle informazioni che ti potrebbere essere molto utili:</p>

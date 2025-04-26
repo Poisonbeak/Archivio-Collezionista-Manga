@@ -26,17 +26,15 @@ const pool = mysql.createPool({
     database: 'collezione manga',
     waitForConnections: true,
     connectionLimit: 10,
-    maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
-    idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
+    maxIdle: 10,
+    idleTimeout: 60000,
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
   });
 
-// const sqlite3 = require('sqlite3').verbose();
-// let db = new sqlite3.Database(__dirname + "/test.db");
-
 const nunjucks = require('nunjucks');
+const { error } = require("console");
 app.set("view engine", "html");
 nunjucks.configure(__dirname + "/views", {
     autoescape: true,
@@ -51,10 +49,31 @@ app.use((req, res, next) => {
     });
   
     next();
-  });
+});
 
 app.get("/", (req, res) => {
-    res.status(200).render("home.html");
+    const user = req.cookies.nickname;
+
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`SELECT M.Nome Nome_Manga, C.NomeFile, C.Path
+                    FROM manga M
+                    LEFT JOIN copertina C ON M.Copertina = C.NomeFile
+                    WHERE M.Nome IN('Naruto', 'Bleach', 'One Piece');`,
+            (error, results) => {
+                if (error) throw error;
+                console.log(results);
+
+                res.status(200).render("home.html", {
+                    bigThreeImages: results,
+                    logged: (!user) ? 0 : 1,
+                });
+
+                console.log('Connessione rilasciata:', conn.threadId);
+                conn.release();
+            })
+    })
 })
 
 app.get("/login", (req, res) => {
@@ -84,7 +103,7 @@ app.post("/login", (req, res) => {
                             (error, results) => {
                                 // console.log(results);
     
-                                res.cookie("nickname", nickname, {httpOnly: false, maxAge: 900000});
+                                res.cookie("nickname", nickname, {httpOnly: false});
 
                                 res.status(200).send(JSON.stringify("Accesso effettuato con successo!"));
                             }
@@ -99,6 +118,36 @@ app.post("/login", (req, res) => {
                 console.log('Connessione rilasciata:', conn.threadId);
                 conn.release();
             })
+    })
+})
+
+app.get("/logout", (req, res) => {
+    const user = req.cookies.nickname;
+
+    res.status(200).render("logout.html", {
+        logged: (!user) ? 0 : 1,
+    });
+})
+
+app.put("/logout", (req, res) => {
+    const nickname = req.cookies.nickname;
+
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        conn.query(`UPDATE utente
+                    SET AccessoEffettuato = false
+                    WHERE Nickname = ?`, [nickname],
+        (error, results) => {
+            if (error) throw error;
+
+            res.clearCookie("nickname");
+            res.status(200).send(JSON.stringify("Log-out effettuato!"));
+
+            console.log('Connessione rilasciata:', conn.threadId);
+            conn.release();
+            }
+        )
     })
 })
 
@@ -182,6 +231,7 @@ app.get("/profilo", (req, res) => {     // possibilità di modificare i dati del
 
             res.status(200).render("profilo.html", {
                 profilo: results,
+                logged: (!user) ? 0 : 1,
             });
             console.log('Connessione rilasciata:', conn.threadId);
             conn.release();
@@ -214,6 +264,8 @@ app.get("/archivio/volumi", (req, res) => {
 });
 
 app.get("/archivio/manga", (req, res) => {
+    const user = req.cookies.nickname;
+
     pool.getConnection((err, conn) => {
         if (err) throw err;
 
@@ -226,6 +278,7 @@ app.get("/archivio/manga", (req, res) => {
 
             res.status(200).render("archivio_manga.html", {
                 rows: results,
+                logged: (!user) ? 0 : 1,
             })
 
             console.log('Connessione rilasciata:', conn.threadId);
@@ -235,6 +288,8 @@ app.get("/archivio/manga", (req, res) => {
 });
 
 app.get("/archivio/volumi/:titolovolume", (req, res) => {
+    const user = req.cookies.nickname;
+    
     const titoloVolume = req.params.titolovolume;
     let queryVolume;
     
@@ -243,12 +298,11 @@ app.get("/archivio/volumi/:titolovolume", (req, res) => {
 
         // Creiamo due promesse per le due query
         const volumePromise = new Promise((resolve, reject) => {
-            conn.query(
-                `SELECT V.ISBN, V.Titolo, Cop.NomeFile, Cop.Path, V.N_Pagine, V.N_Volume, M.Nome Nome_Manga, M.Edizione
-                 FROM volume V 
-                 INNER JOIN manga M ON V.ID_Manga = M.ID_Manga
-                 LEFT JOIN copertina_volume Cop ON V.Copertina = Cop.NomeFile
-                 WHERE V.Titolo = ?;`, [titoloVolume],
+            conn.query(`SELECT V.ISBN, V.Titolo, Cop.NomeFile, Cop.Path, V.N_Pagine, V.N_Volume, M.Nome Nome_Manga, M.Edizione
+                        FROM volume V 
+                        INNER JOIN manga M ON V.ID_Manga = M.ID_Manga
+                        LEFT JOIN copertina Cop ON V.Copertina = Cop.NomeFile
+                        WHERE V.Titolo = ?;`, [titoloVolume],
                 (error, results) => {
                     if (error) {
                         reject(error); // In caso di errore, rifiutiamo la promessa
@@ -284,7 +338,8 @@ app.get("/archivio/volumi/:titolovolume", (req, res) => {
                 // La seconda promessa ha risolto `rivenditori`
                 res.status(200).render("volume.html", {
                     campiVolume: queryVolume,
-                    rivenditori: results[1] // `results[1]` è il risultato della seconda query
+                    rivenditori: results[1], // `results[1]` è il risultato della seconda query
+                    logged: (!user) ? 0 : 1,
                 });
             })
             .catch((error) => {
@@ -300,6 +355,8 @@ app.get("/archivio/volumi/:titolovolume", (req, res) => {
 });
 
 app.get("/archivio/manga/:nomemanga", (req, res) => {
+    const user = req.cookies.nickname;
+    
     const nomeManga = req.params.nomemanga;
     
     pool.getConnection((err, conn) => {
@@ -307,12 +364,15 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
 
         const mangaPromise = new Promise((resolve, reject) => {
             conn.query(`SELECT M.ID_Manga, M.Nome Nome_Manga, M.Edizione, M.A_Colori, M.Contenuti_Extra,
-                        AU.Nome Nome_Autore, AU.Cognome Cognome_Autore, AU.Pseudonimo Pseudonimo_Autore, AR.Nome Nome_Artista, AR.Cognome Cognome_Artista, AR.Pseudonimo Pseudonimo_Artista, E.Nome Nome_Editore
+                        AU.Nome Nome_Autore, AU.Cognome Cognome_Autore, AU.Pseudonimo Pseudonimo_Autore,
+                        AR.Nome Nome_Artista, AR.Cognome Cognome_Artista, AR.Pseudonimo Pseudonimo_Artista,
+                        E.Nome Nome_Editore, C.NomeFile, C.Path
                         FROM manga M LEFT JOIN artista_manga J1 ON M.ID_Manga = J1.ID_Manga
                         LEFT JOIN artista AR ON J1.ID_Artista = AR.ID_Artista
                         LEFT JOIN autore_manga J2 ON M.ID_Manga = J2.ID_Manga
                         LEFT JOIN autore AU ON J2.ID_Autore = AU.ID_Autore
                         LEFT JOIN editore E ON M.Cod_Editore = E.Cod_Editore
+                        LEFT JOIN copertina C ON M.Copertina = C.NomeFile
                         WHERE M.Nome = ?;`,
                         [nomeManga],
             (error, results) => {
@@ -326,7 +386,7 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
 
         const volumiPromise = new Promise((resolve, reject) => {
             conn.query(`SELECT V.Titolo Titolo_Volume, V.N_Volume, Cop.NomeFile, Cop.Path
-            FROM volume V LEFT JOIN copertina_volume Cop ON V.Copertina = Cop.NomeFile
+                        FROM volume V LEFT JOIN copertina Cop ON V.Copertina = Cop.NomeFile
                         INNER JOIN manga M ON V.ID_Manga = M.ID_Manga
                         WHERE M.Nome = ?;`,
                         [nomeManga],
@@ -347,6 +407,7 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
                 res.status(200).render("manga.html", {
                     manga: manga,
                     volumi: volumi,
+                    logged: (!user) ? 0 : 1,
                 })
             })
             .catch((error) => {
@@ -400,7 +461,7 @@ app.get("/collezione", (req, res) => {
             conn.query(`SELECT V.Titolo, M.Nome Nome_Manga, V.N_Volume, C.NomeFile, C.Path
                         FROM manga M
                         INNER JOIN volume V ON M.ID_Manga = V.ID_Manga
-                        LEFT JOIN copertina_volume C ON V.Copertina = C.NomeFile
+                        LEFT JOIN copertina C ON V.Copertina = C.NomeFile
                         INNER JOIN volumi_utente VU ON V.ISBN = VU.ISBN_Volume
                         WHERE VU.Nickname_Utente = ?
                         ORDER BY M.Nome ASC, V.N_Volume ASC`, [user],
@@ -411,13 +472,14 @@ app.get("/collezione", (req, res) => {
                     resolve(results)
                 }
             })
-
         });
 
         const mangaPromise = new Promise((resolve, reject) => {
-            conn.query(`SELECT DISTINCT M.Nome FROM manga M
+            conn.query(`SELECT DISTINCT M.Nome, C.NomeFile, C.Path
+                        FROM manga M
                         INNER JOIN volume V ON M.ID_Manga = V.ID_Manga
                         INNER JOIN volumi_utente VU ON V.ISBN = VU.ISBN_Volume
+                        LEFT JOIN copertina C ON M.Copertina = C.NomeFile
                         WHERE VU.Nickname_Utente = ?
                         ORDER BY M.Nome ASC`, [user],
             (error, results) => {
@@ -437,6 +499,7 @@ app.get("/collezione", (req, res) => {
                 res.status(200).render("collezione.html", {
                     volumiPosseduti: volumi,
                     mangaPosseduti: manga,
+                    logged: (!user) ? 0 : 1,
                 })
             })
             .catch((error) => {

@@ -1,12 +1,14 @@
-Priorità 2: Logout
+|
+V
 
-Priorità 3: inserisci le copertine dei manga (copertina_volume -> copertina, relazione con entità manga)
-aggiungile poi alla pagina di presentazione dei singoli manga, nelle collezioni e nella home
+possibilità di modificare i dati del profilo da loggato
 
-Priorità 4: possibilità di modificare i dati del profilo da loggato
+controllo sui form
 
-Priorità 5: ricerca volumi e manga specifici
+elimina da collezione
 
-Priorità 6: aggiungi tutti i volumi di un manga sempre con spunta nell'archivio (se si possiedono già alcuni volumi, solo quelli mancanti)
+ricerca volumi e manga specifici
 
-Priorità 7: errori server dettagliati
+aggiungi tutti i volumi di un manga sempre con spunta nell'archivio (se si possiedono già alcuni volumi, solo quelli mancanti)
+
+errori server dettagliati

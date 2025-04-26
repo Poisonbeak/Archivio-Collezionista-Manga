@@ -1,0 +1,21 @@
+input{
+    margin: 5px 20px 20px 20px;
+    font-size: 17px;
+    font-family: cursive;
+    border: 1px solid black;
+}
+input[data-autocompleted] {
+    background-color: transparent !important;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    transition: background-color 0s 0s, color 0s 0s;
+    transition-delay: calc(infinity * 1s);
+}
+button{
+    margin: 20px;
+    font-size: 20px;
+}
+input[type="checkbox"]{
+    margin: 0;
+}

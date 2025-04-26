@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 
+{% block css %}
+<link rel="stylesheet" href="/static/styles/info_volume_manga.css">
+{% endblock %}
+
 {% block content %}
 <div id="overview_manga">
     {% for m in manga %}
     <h1>{{ m.Nome_Manga }}</h1>
+    <img class="immagine" src="{{ m.Path }}/{{ m.NomeFile }}" alt="Copertina {{ m.Nome_Manga }}">
     <div id="info">
         <p><b>ID: </b>{{ m.ID_Manga }}</p>
         <p><b>Edizione: </b>{{ m.Edizione }}</p>
@@ -31,7 +36,7 @@
     {% for volume in volumi %}
     <div class="singolo_volume">
         <p>{{ volume.N_Volume }}</p>
-        <img class="immagine_volume_ridotta" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="Copertina {{ volume.Titolo }}">
+        <img class="immagine_ridotta" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="Copertina {{ volume.Titolo }}">
         <a href="/archivio/volumi/{{ volume.Titolo_Volume }}"><b>{{ volume.Titolo_Volume }}</b></a>
     </div>
     {% endfor %}

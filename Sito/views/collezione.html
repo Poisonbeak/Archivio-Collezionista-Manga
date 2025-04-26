@@ -10,6 +10,7 @@
     <div id="scaffale">
         {% for manga in mangaPosseduti %}
             <div class="raccoglitore_manga">
+                <img class="immagine_ridotta" src="{{ manga.Path }}/{{ manga.NomeFile }}" alt="Copertina {{ manga.Nome }}">
                 <h2><a href="/archivio/manga/{{ manga.Nome }}">{{ manga.Nome }}</a></h2>
             </div>
         {% endfor %}
@@ -20,7 +21,7 @@
             {% if (volume.Nome_Manga == manga.Nome) %}
                 <div class="singolo_volume">
                     <p>{{ volume.N_Volume }}</p>
-                    <img class="immagine_volume_ridotta" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="Copertina {{ volume.Titolo }}">
+                    <img class="immagine_ridotta" src="{{ volume.Path }}/{{ volume.NomeFile }}" alt="Copertina {{ volume.Titolo }}">
                     <a href="/archivio/volumi/{{ volume.Titolo }}"><b>{{ volume.Titolo }}</b></a>
                 </div>
             {% endif %}
