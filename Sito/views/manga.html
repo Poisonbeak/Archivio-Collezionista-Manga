@@ -18,6 +18,7 @@
         <p><b>Contenuti Extra: </b>
             {% if (m.Contenuti_Extra) %} Sì {% else %} No {% endif %}
         </p>
+        <p><b>Genere: </b>{{ m.Genere }}</p>
         <p><b>Autore/i: </b>
             {{ m.Nome_Autore }} {{ m.Cognome_Autore }} 
             {% if (m.Pseudonimo_Autore != NULL) %} ({{ m.Pseudonimo_Autore }}) {% endif %}

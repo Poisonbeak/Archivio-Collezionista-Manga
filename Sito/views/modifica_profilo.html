@@ -5,39 +5,55 @@
 {% endblock %}
 
 {% block content %}
-<h1>Registrazione</h1>
-<form id="form_registrazione">
+<h1>Modifica Profilo</h1>
+<form id="form_modifica">
     {% for dati in profilo %}
     <div>
-        <label for="nickname">Nickname:</label><br>
-        <input type="text" name="nickname" id="input_nickname" value="{{ dati.Nickname }}" required>
+        <label for="input_nickname">Nickname:</label><br>
+        <input type="text" name="nickname" id="input_nickname" minlength="3" maxlength="40" value="{{ dati.Nickname }}" required>
     </div>
     <div>
-        <label for="nome">Nome:</label><br>
-        <input type="text" name="nome" value="{{ dati.Nome }}" required>
+        <label for="input_nome">Nome:</label><br>
+        <input type="text" name="nome" id="input_nome" value="{{ dati.Nome }}" required>
     </div>
     <div>
-        <label for="cognome">Cognome:</label><br>
-        <input type="text" name="cognome" value="{{ dati.Cognome }}" required>
+        <label for="input_cognome">Cognome:</label><br>
+        <input type="text" name="cognome" id="input_cognome" value="{{ dati.Cognome }}" required>
     </div>
     <div>
-        <label for="email">Email:</label><br>
-        <input type="email" name="email" value="{{ dati.Email }}" required>
+        <label for="input_email">Email:</label><br>
+        <input type="email" name="email" id="input_email" value="{{ dati.Email }}" required>
     </div>
     <div>
-        <label for="data_di_nascita">Data di nascita:</label><br>
-        <input type="date" name="data_di_nascita" value="{{ dati.Data_Nascita }}" required>
-    </div>
-    <div> 
-        <label for="città">Città:</label><br>
-        <input type="text" name="città" value="{{ dati.comune }}" required>
+        <label for="input_data_di_nascita">Data di nascita:</label><br>
+        <input type="date" name="data_di_nascita" id="input_data_di_nascita" value="{{ dati.Data_Nascita }}"  min="1900-01-01" required>
     </div>
     <div>
-        <label for="regione">Regione:</label><br>
-        <input type="text" name="regione" value="{{ dati.regione }}" required>
+        <label for="input_città">Città:</label><br>
+        <select name="città"  id="input_città">
+            {% for c in città %}
+                {% if (dati.Comune != c.comune) %}
+                <option value="{{ c.comune }}">{{ c.comune }}</option>
+                {% else %}
+                <option value="{{ c.comune }}" selected>{{ c.comune }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="input_regione">Regione:</label><br>
+        <select name="regione" id="input_regione">
+            {% for r in regioni %}
+                {% if (dati.Regione != r.regione) %}
+                <option value="{{ r.regione }}">{{ r.regione }}</option>
+                {% else %}
+                <option value="{{ r.regione }}" selected>{{ r.regione }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
     </div>
     {% endfor %}
-    <button type="button" id="bottone_invio">Conferma modifiche</button>
+    <button type="submit">Conferma modifiche</button>
 </form>
 <p id="display_risposta"></p>
 {% endblock %}

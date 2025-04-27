@@ -10,13 +10,13 @@
 <form id="form_login">
     <div>
         <label for="input_nickname">Nickname:</label>
-        <input type="text" name="nickname" id="input_nickname" required>
+        <input type="text" name="nickname" id="input_nickname" minlength="1" maxlength="40" required>
     </div>
     <div>
         <label for="input_password">Password:</label>
-        <input type="password" name="password" id="input_password" required>
+        <input type="password" name="password" id="input_password" maxlength="64" required>
     </div>
-    <button type="button" id="bottone_invio">Accedi</button>
+    <button type="submit">Accedi</button>
 </form>
 <p id="display_risposta"></p>
 <p>Non hai un account? <a href="/registrazione">Registrati</a></p>

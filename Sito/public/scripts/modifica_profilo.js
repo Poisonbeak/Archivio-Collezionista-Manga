@@ -1,12 +1,24 @@
 window.addEventListener("DOMContentLoaded", e => {
-    const [nickname, nome, cognome, email, dataNascita, città, regione] = document.getElementsByTagName("input");
+    const [nickname, nome, cognome, email, dataNascita] = document.getElementsByTagName("input");
+    const [città, regione] = document.getElementsByTagName("select");
     const nicknameOriginale = nickname.value;
     const emailOriginale = email.value;
 
-    const bottoneInvio = document.getElementById("bottone_invio");
+    const today = new Date();
+    const maxDateString = today.toISOString().split('T')[0]
+    dataNascita.max = maxDateString; 
+
+    const form = document.getElementById("form_modifica");
     const displayRisposta = document.getElementById("display_risposta");
 
-    bottoneInvio.addEventListener("click", e => {
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
         fetch("http://localhost:5000/profilo/modifica", {
             method: 'POST',
             headers: {

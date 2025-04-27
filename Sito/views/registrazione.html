@@ -8,38 +8,47 @@
 <h1>Registrazione</h1>
 <form id="form_registrazione">
     <div>
-        <label for="nickname">Nickname:</label><br>
-        <input type="text" name="nickname" id="input_nickname" required>
+        <label for="input_nickname">Nickname:</label><br>
+        <input type="text" name="nickname" id="input_nickname" minlength="3" maxlength="40" required>
     </div>
     <div>
-        <label for="password">Password:</label><br>
-        <input type="password" name="password" id="input_password" required>
+        <label for="input_password">Password:</label><br>
+        <input type="password" name="password" id="input_password" minlength="8" maxlength="64" required>
+        <sub>Deve avere almeno una maiscuola, una minuscola, un numero e un simbolo</sub>
     </div>
     <div>
-        <label for="nome">Nome:</label><br>
-        <input type="text" name="nome" required>
+        <label for="input_nome">Nome:</label><br>
+        <input type="text" name="nome" id="input_nome" required>
     </div>
     <div>
-        <label for="cognome">Cognome:</label><br>
-        <input type="text" name="cognome" required>
+        <label for="input_cognome">Cognome:</label><br>
+        <input type="text" name="cognome" id="input_cognome" required>
     </div>
     <div>
-        <label for="email">Email:</label><br>
-        <input type="email" name="email" required>
+        <label for="input_email">Email:</label><br>
+        <input type="email" name="email" id="input_email" required>
     </div>
     <div>
-        <label for="data_di_nascita">Data di nascita:</label><br>
-        <input type="date" name="data_di_nascita" required>
-    </div>
-    <div> 
-        <label for="città">Città:</label><br>
-        <input type="text" name="città" required>
+        <label for="input_data_di_nascita">Data di nascita:</label><br>
+        <input type="date" name="data_di_nascita" id="input_data_di_nascita" min="1900-01-01" required>
     </div>
     <div>
-        <label for="regione">Regione:</label><br>
-        <input type="text" name="regione" required>
+        <label for="input_città">Città:</label><br>
+        <select name="città"  id="input_città">
+            {% for c in città %}
+            <option value="{{ c.comune }}">{{ c.comune }}</option>
+            {% endfor %}
+        </select>
     </div>
-    <button type="button" id="bottone_invio">Registrati</button>
+    <div>
+        <label for="input_regione">Regione:</label><br>
+        <select name="regione" id="input_regione">
+            {% for r in regioni %}
+            <option value="{{ r.regione }}">{{ r.regione }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit">Registrati</button>
     <p>Hai già un account? <a href="/login">Login</a></p>
 </form>
 <p id="display_risposta"></p>

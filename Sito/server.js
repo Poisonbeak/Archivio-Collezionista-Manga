@@ -11,7 +11,7 @@ app.use(cookieParser());
 app.use("/static", express.static(path.join(__dirname, "public")));
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended:true }));
 app.set("view engine", "html");
 
 const dotenv = require("dotenv");
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
     console.log(`→ ${req.method} ${req.url}`);
     
     res.on('finish', () => {
-      console.log(`← Response sent for ${req.method} ${req.url} with status ${res.statusCode}`);
+      console.log(`← Response sent for ${req.method} ${req.url} with status ${res.statusCode}\n`);
     });
   
     next();
@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
                     WHERE M.Nome IN('Naruto', 'Bleach', 'One Piece');`,
             (error, results) => {
                 if (error) throw error;
-                console.log(results);
+                // console.log(results);
 
                 res.status(200).render("home.html", {
                     bigThreeImages: results,
@@ -151,7 +151,52 @@ app.put("/logout", (req, res) => {
 })
 
 app.get("/registrazione", (req, res) => {
-    res.status(200).render("registrazione.html");
+    pool.getConnection((err, conn) => {
+        if (err) throw err;
+
+        const cittàPromise = new Promise((resolve, reject) => {
+            conn.query(`SELECT comune FROM database_comuni.italy_cities`,
+                (error, results) => {
+                    if (error) {
+                        reject(error); // In caso di errore, rifiutiamo la promessa
+                    } else {
+                        resolve(results); // Se la query va a buon fine, risolviamo la promessa
+                    }
+                }
+            );
+        });
+
+        const regioniPromise = new Promise((resolve, reject) => {
+            conn.query(`SELECT regione FROM database_comuni.italy_regions`,
+                (error, results) => {
+                    if (error) {
+                        reject(error); // In caso di errore, rifiutiamo la promessa
+                    } else {
+                        resolve(results); // Risolviamo la promessa con i dati dei rivenditori
+                    }
+                }
+            );
+        });
+
+        Promise.all([cittàPromise, regioniPromise])
+            .then((results) => {
+                const città = results[0];
+                const regioni = results[1];
+
+                res.status(200).render("registrazione.html", {
+                    città: città,
+                    regioni: regioni,
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+                res.status(500).send("Errore nel recupero dei dati.");
+            })
+            .finally(() => {
+                console.log('Connessione rilasciata:', conn.threadId);
+                conn.release();
+            });
+    });
 })
 
 app.post("/registrazione", (req, res) => {
@@ -236,37 +281,80 @@ app.get("/profilo/modifica", (req, res) => {
     pool.getConnection((err, conn) => {
         if (err) throw err;
 
-        conn.query(`SELECT U.Nickname, U.Password, U.Nome, U.Cognome, U.Data_Nascita, C.comune, R.regione, U.Email
-                    FROM utente U
-                    INNER JOIN database_comuni.italy_cities C ON U.Città = C.istat 
-                    INNER JOIN database_comuni.italy_regions R ON U.Regione = R.id_regione
-                    WHERE U.Nickname = ?`, [user],
-            (error, results) => {
-                if (error) throw error;
-
-                if (!results || results.length === 0) {
-                    conn.release();
-                    return res.status(404).send("Utente non trovato.");
+        const cittàPromise = new Promise((resolve, reject) => {
+            conn.query(`SELECT comune FROM database_comuni.italy_cities`,
+                (error, results) => {
+                    if (error) {
+                        reject(error); // In caso di errore, rifiutiamo la promessa
+                    } else {
+                        resolve(results); // Se la query va a buon fine, risolviamo la promessa
+                    }
                 }
+            );
+        });
 
-                const data = new Date(results[0].Data_Nascita);
+        const regioniPromise = new Promise((resolve, reject) => {
+            conn.query(`SELECT regione FROM database_comuni.italy_regions`,
+                (error, results) => {
+                    if (error) {
+                        reject(error); // In caso di errore, rifiutiamo la promessa
+                    } else {
+                        resolve(results); // Risolviamo la promessa con i dati dei rivenditori
+                    }
+                }
+            );
+        });
 
-                const anno = data.getFullYear();                            // formatta a yyyy-mm-dd richesto dall'input lato client
-                const mese = String(data.getMonth() + 1).padStart(2, '0');
-                const giorno = String(data.getDate()).padStart(2, '0'); 
+        const profiloPromise = new Promise((resolve, reject) => {
+            conn.query(`SELECT U.Nickname, U.Password, U.Nome, U.Cognome, U.Data_Nascita, C.comune, R.regione, U.Email
+                        FROM utente U
+                        INNER JOIN database_comuni.italy_cities C ON U.Città = C.istat 
+                        INNER JOIN database_comuni.italy_regions R ON U.Regione = R.id_regione
+                        WHERE U.Nickname = ?`, [user],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        if (!results || results.length === 0) {
+                            conn.release();
+                            return res.status(404).send("Utente non trovato.");
+                        }
+    
+                        const data = new Date(results[0].Data_Nascita);
+    
+                        const anno = data.getFullYear();                            // formatta a yyyy-mm-dd richesto dall'input lato client
+                        const mese = String(data.getMonth() + 1).padStart(2, '0');
+                        const giorno = String(data.getDate()).padStart(2, '0'); 
+    
+                        results[0].Data_Nascita = `${anno}-${mese}-${giorno}`;
 
-                results[0].Data_Nascita = `${anno}-${mese}-${giorno}`;
+                        resolve(results);
+                    }
+                })
+        });
+
+        Promise.all([cittàPromise, regioniPromise, profiloPromise])
+            .then((results) => {
+                const città = results[0];
+                const regioni = results[1];
+                const profilo = results[2];
 
                 res.status(200).render("modifica_profilo.html", {
-                    profilo: results,
+                    città: città,
+                    regioni: regioni,
+                    profilo: profilo,
                     logged: (!user) ? 0 : 1,
-                })
-                
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+                res.status(500).send("Errore nel recupero dei dati.");
+            })
+            .finally(() => {
                 console.log('Connessione rilasciata:', conn.threadId);
                 conn.release();
-            })
-    })
-
+            });
+    });
 })
 
 app.post("/profilo/modifica", (req, res) => {
@@ -446,14 +534,17 @@ app.get("/archivio/manga/:nomemanga", (req, res) => {
         if (err) throw err;
 
         const mangaPromise = new Promise((resolve, reject) => {
-            conn.query(`SELECT M.ID_Manga, M.Nome Nome_Manga, M.Edizione, M.A_Colori, M.Contenuti_Extra,
+            conn.query(`SELECT M.ID_Manga, M.Nome Nome_Manga, M.Edizione, G.Nome Genere, M.A_Colori, M.Contenuti_Extra,
                         AU.Nome Nome_Autore, AU.Cognome Cognome_Autore, AU.Pseudonimo Pseudonimo_Autore,
                         AR.Nome Nome_Artista, AR.Cognome Cognome_Artista, AR.Pseudonimo Pseudonimo_Artista,
                         E.Nome Nome_Editore, C.NomeFile, C.Path
-                        FROM manga M LEFT JOIN artista_manga J1 ON M.ID_Manga = J1.ID_Manga
+                        FROM manga M
+                        LEFT JOIN artista_manga J1 ON M.ID_Manga = J1.ID_Manga
                         LEFT JOIN artista AR ON J1.ID_Artista = AR.ID_Artista
                         LEFT JOIN autore_manga J2 ON M.ID_Manga = J2.ID_Manga
                         LEFT JOIN autore AU ON J2.ID_Autore = AU.ID_Autore
+                        LEFT JOIN genere_manga J3 ON M.ID_Manga = J3.ID_Manga
+                        LEFT JOIN genere G ON J3.ID_Genere = G.ID_Genere
                         LEFT JOIN editore E ON M.Cod_Editore = E.Cod_Editore
                         LEFT JOIN copertina C ON M.Copertina = C.NomeFile
                         WHERE M.Nome = ?;`,
