@@ -8,7 +8,7 @@ window.addEventListener("DOMContentLoaded", e => {
         let titoliPosseduti = message;
         console.log(titoliPosseduti);
         
-        for (let i = 0; i < titoliPosseduti.length; i++) {      // efficienza bruttissima (esponenziale mado)
+        for (let i = 0; i < titoliPosseduti.length; i++) {      // efficienza bruttissima (esponenziale), ma ce la facciamo andare bene
             for (let j = 0; j < checkbox.length; j++) {
                 if (titoliPosseduti[i].Titolo == titoli[j].innerText) {
                     checkbox[j].checked = true;
