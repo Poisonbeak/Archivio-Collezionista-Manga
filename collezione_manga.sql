@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Creato il: Apr 20, 2025 alle 14:38
+-- Creato il: Apr 27, 2025 alle 11:22
 -- Versione del server: 8.4.3
 -- Versione PHP: 8.3.16
 
@@ -42,7 +42,9 @@ CREATE TABLE `artista` (
 
 INSERT INTO `artista` (`ID_Artista`, `Nome`, `Cognome`, `Data_Nascita`, `Pseudonimo`, `Stile_Disegno`) VALUES
 (1, 'Takeshi', 'Obata', '1969-02-11', NULL, 'Realistico'),
-(2, 'Masashi', 'Kishimoto', '1974-11-08', 'Kishi', 'Stile shōnen classico, con linee pulite e azione fluida');
+(2, 'Masashi', 'Kishimoto', '1974-11-08', 'Kishi', 'Stile shōnen classico, con linee pulite e azione fluida'),
+(3, 'Noriaki', 'Kubo', '1977-06-26', 'Tite Kubo', 'Pulito ed elegante, design stilizzati'),
+(4, 'Eiichiro', 'Oda', '1975-01-01', '', 'Caricaturale, proporzioni distorte ed espressioni esagerate, dinamico');
 
 -- --------------------------------------------------------
 
@@ -61,7 +63,9 @@ CREATE TABLE `artista_manga` (
 
 INSERT INTO `artista_manga` (`ID_Artista`, `ID_Manga`) VALUES
 (2, 1),
-(1, 2);
+(1, 2),
+(3, 3),
+(4, 4);
 
 -- --------------------------------------------------------
 
@@ -83,7 +87,9 @@ CREATE TABLE `autore` (
 
 INSERT INTO `autore` (`ID_Autore`, `Nome`, `Cognome`, `Data_Nascita`, `Pseudonimo`) VALUES
 (1, 'Masashi', 'Kishimoto', '1974-11-08', 'Kishi'),
-(2, 'Tsugumi', 'Ohba', '1970-08-15', NULL);
+(2, 'Tsugumi', 'Ohba', '1970-08-15', NULL),
+(3, 'Noriaki', 'Kubo', '1977-06-26', 'Tite Kubo'),
+(4, 'Eiichiro', 'Oda', '1975-01-01', NULL);
 
 -- --------------------------------------------------------
 
@@ -102,26 +108,38 @@ CREATE TABLE `autore_manga` (
 
 INSERT INTO `autore_manga` (`ID_Autore`, `ID_Manga`) VALUES
 (1, 1),
-(2, 2);
+(2, 2),
+(3, 3),
+(4, 4);
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `copertina_volume`
+-- Struttura della tabella `copertina`
 --
 
-CREATE TABLE `copertina_volume` (
+CREATE TABLE `copertina` (
   `NomeFile` varchar(255) NOT NULL,
-  `Path` varchar(255) NOT NULL,
+  `Path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '/static/copertine',
   `Dimensioni` varchar(11) NOT NULL,
   `Spazio_Occupato_KB` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dump dei dati per la tabella `copertina_volume`
+-- Dump dei dati per la tabella `copertina`
 --
 
-INSERT INTO `copertina_volume` (`NomeFile`, `Path`, `Dimensioni`, `Spazio_Occupato_KB`) VALUES
+INSERT INTO `copertina` (`NomeFile`, `Path`, `Dimensioni`, `Spazio_Occupato_KB`) VALUES
+('Bleach Vol. 1.jpg', '/static/copertine', '311x466', 36.3),
+('Bleach Vol. 2.jpg', '/static/copertine', '1400x2100', 285),
+('Bleach Vol. 3.jpg', '/static/copertine', '1463x2219', 562),
+('Bleach Vol. 4.jpg', '/static/copertine', '682x1000', 82.7),
+('Bleach Vol. 5.jpg', '/static/copertine', '676x1000', 97.7),
+('Death Note Vol. 1.jpg', '/static/copertine', '667x1000', 125),
+('Death Note Vol. 2.jpg', '/static/copertine', '655x1000', 133),
+('Death Note Vol. 3.jpg', '/static/copertine', '658x1000', 184),
+('Death Note Vol. 4.jpg', '/static/copertine', '1000x1524', 335),
+('Death Note Vol. 5.jpg', '/static/copertine', '657x1000', 155),
 ('Naruto Vol. 1.jpg', '/static/copertine', '682x1092', 165.9),
 ('Naruto Vol. 10.jpg', '/static/copertine', '682x1092', 156.6),
 ('Naruto Vol. 2.jpg', '/static/copertine', '682x1092', 177.8),
@@ -131,7 +149,12 @@ INSERT INTO `copertina_volume` (`NomeFile`, `Path`, `Dimensioni`, `Spazio_Occupa
 ('Naruto Vol. 6.jpg', '/static/copertine', '682x1092', 161),
 ('Naruto Vol. 7.jpg', '/static/copertine', '685x1092', 162.3),
 ('Naruto Vol. 8.jpg', '/static/copertine', '682x1092', 140.8),
-('Naruto Vol. 9.jpg', '/static/copertine', '682x1092', 156.9);
+('Naruto Vol. 9.jpg', '/static/copertine', '682x1092', 156.9),
+('One Piece Vol. 1.jpg', '/static/copertine', '415x635', 67.3),
+('One Piece Vol. 2.jpg', '/static/copertine', '647x1000', 118),
+('One Piece Vol. 3.jpg', '/static/copertine', '663x1000', 117),
+('One Piece Vol. 4.jpg', '/static/copertine', '649x1000', 96.5),
+('One Piece Vol. 5.jpg', '/static/copertine', '753x1177', 234);
 
 -- --------------------------------------------------------
 
@@ -151,7 +174,8 @@ CREATE TABLE `editore` (
 
 INSERT INTO `editore` (`Cod_Editore`, `Nome`, `Data_Fondazione`) VALUES
 ('ED001', 'Planet Manga', '1990-04-15'),
-('ED002', 'J-Pop', '2001-11-20');
+('ED002', 'J-Pop', '2001-11-20'),
+('ED003', 'Shueisha', '1925-12-03');
 
 -- --------------------------------------------------------
 
@@ -190,61 +214,9 @@ CREATE TABLE `genere_manga` (
 
 INSERT INTO `genere_manga` (`ID_Manga`, `ID_Genere`) VALUES
 (1, 1),
+(3, 1),
+(4, 1),
 (2, 2);
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `lingua`
---
-
-CREATE TABLE `lingua` (
-  `ID_Lingua` int NOT NULL,
-  `Nome` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dump dei dati per la tabella `lingua`
---
-
-INSERT INTO `lingua` (`ID_Lingua`, `Nome`) VALUES
-(1, 'Giapponese'),
-(2, 'Inglese'),
-(3, 'Italiano'),
-(4, 'Francese'),
-(5, 'Spagnolo'),
-(6, 'Tedesco'),
-(7, 'Portoghese'),
-(8, 'Cinese (semplificato)'),
-(9, 'Cinese (tradizionale)'),
-(10, 'Coreano'),
-(11, 'Russo'),
-(12, 'Indonesiano'),
-(13, 'Thai'),
-(14, 'Polacco'),
-(15, 'Arabo');
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `lingue_volume`
---
-
-CREATE TABLE `lingue_volume` (
-  `ID_Lingua` int NOT NULL,
-  `ISBN_Volume` varchar(17) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dump dei dati per la tabella `lingue_volume`
---
-
-INSERT INTO `lingue_volume` (`ID_Lingua`, `ISBN_Volume`) VALUES
-(1, '9788881234567'),
-(3, '9788881234567'),
-(1, '9788887654321'),
-(2, '9788887654321'),
-(3, '9788887654321');
 
 -- --------------------------------------------------------
 
@@ -258,16 +230,19 @@ CREATE TABLE `manga` (
   `Edizione` varchar(255) NOT NULL,
   `A_Colori` tinyint(1) NOT NULL,
   `Contenuti_Extra` tinyint(1) NOT NULL,
-  `Cod_Editore` varchar(7) NOT NULL
+  `Cod_Editore` varchar(7) NOT NULL,
+  `Copertina` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dump dei dati per la tabella `manga`
 --
 
-INSERT INTO `manga` (`ID_Manga`, `Nome`, `Edizione`, `A_Colori`, `Contenuti_Extra`, `Cod_Editore`) VALUES
-(1, 'Naruto', 'Prima Edizione', 0, 1, 'ED001'),
-(2, 'Death Note', 'Edizione Deluxe', 0, 1, 'ED002');
+INSERT INTO `manga` (`ID_Manga`, `Nome`, `Edizione`, `A_Colori`, `Contenuti_Extra`, `Cod_Editore`, `Copertina`) VALUES
+(1, 'Naruto', 'Prima Edizione', 0, 1, 'ED001', 'Naruto Vol. 1.jpg'),
+(2, 'Death Note', 'Edizione Deluxe', 0, 1, 'ED002', 'Death Note Vol. 1.jpg'),
+(3, 'Bleach', 'Prima Edizione', 0, 1, 'ED003', 'Bleach Vol. 1.jpg'),
+(4, 'One Piece', 'Prima Edizione', 0, 1, 'ED003', 'One Piece Vol. 1.jpg');
 
 -- --------------------------------------------------------
 
@@ -306,17 +281,17 @@ CREATE TABLE `utente` (
   `Città` int NOT NULL,
   `Regione` smallint NOT NULL,
   `Email` varchar(319) NOT NULL,
-  `Password` varchar(255) NOT NULL
+  `Password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `AccessoEffettuato` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dump dei dati per la tabella `utente`
 --
 
-INSERT INTO `utente` (`Nickname`, `Nome`, `Cognome`, `Data_Nascita`, `Città`, `Regione`, `Email`, `Password`) VALUES
-('animefan95', 'Giulia', 'Rossi', '1998-11-05', 1002, 12, 'giuliarossi@example.com', 'securepass456'),
-('mangafreak23', 'Luca', 'Bianchi', '1995-07-15', 1001, 12, 'lucabianchi@example.com', 'password123'),
-('otaku_lover', 'Marco', 'Verdi', '2000-03-25', 1003, 12, 'marcoverdi@example.com', 'mypassword789');
+INSERT INTO `utente` (`Nickname`, `Nome`, `Cognome`, `Data_Nascita`, `Città`, `Regione`, `Email`, `Password`, `AccessoEffettuato`) VALUES
+('bbb', 'b', 'b', '2022-02-22', 1016, 12, 'b@b', '$2b$10$AKtb.aXeYZnixD6m2/dxFOJjGnfbiOYsrI.feGyXFi6eSOfH7CXAi', 0),
+('mk11', 'Michele', 'Alfano', '2006-05-03', 1001, 1, 'michele.alfano@davincimilazzo.edu.it', '$2b$10$HeqCTMVzA34NLmbaR6DLmO2/mD8m09vPD/WC02FUQlt9IVVftxtvC', 1);
 
 -- --------------------------------------------------------
 
@@ -338,6 +313,16 @@ CREATE TABLE `volume` (
 --
 
 INSERT INTO `volume` (`ISBN`, `Titolo`, `N_Pagine`, `N_Volume`, `ID_Manga`, `Copertina`) VALUES
+('9784088733775', 'Bleach Vol. 1', 200, 1, 3, 'Bleach Vol. 1.jpg'),
+('9784088733782', 'Bleach Vol. 2', 200, 2, 3, 'Bleach Vol. 2.jpg'),
+('9784088733799', 'Bleach Vol. 3', 200, 3, 3, 'Bleach Vol. 3.jpg'),
+('9784088733805', 'Bleach Vol. 4', 200, 4, 3, 'Bleach Vol. 4.jpg'),
+('9784088733812', 'Bleach Vol. 5', 200, 5, 3, 'Bleach Vol. 5.jpg'),
+('9784088734010', 'One Piece Vol. 1', 200, 1, 4, 'One Piece Vol. 1.jpg'),
+('9784088734027', 'One Piece Vol. 2', 200, 2, 4, 'One Piece Vol. 2.jpg'),
+('9784088734034', 'One Piece Vol. 3', 200, 3, 4, 'One Piece Vol. 3.jpg'),
+('9784088734041', 'One Piece Vol. 4', 200, 4, 4, 'One Piece Vol. 4.jpg'),
+('9784088734058', 'One Piece Vol. 5', 200, 5, 4, 'One Piece Vol. 5.jpg'),
 ('9788881234567', 'Naruto Vol. 1', 192, 1, 1, 'Naruto Vol. 1.jpg'),
 ('9788881234568', 'Naruto Vol. 2', 192, 2, 1, 'Naruto Vol. 2.jpg'),
 ('9788881234569', 'Naruto Vol. 3', 192, 3, 1, 'Naruto Vol. 3.jpg'),
@@ -348,16 +333,11 @@ INSERT INTO `volume` (`ISBN`, `Titolo`, `N_Pagine`, `N_Volume`, `ID_Manga`, `Cop
 ('9788881234574', 'Naruto Vol. 8', 192, 8, 1, 'Naruto Vol. 8.jpg'),
 ('9788881234575', 'Naruto Vol. 9', 192, 9, 1, 'Naruto Vol. 9.jpg'),
 ('9788881234576', 'Naruto Vol. 10', 192, 10, 1, 'Naruto Vol. 10.jpg'),
-('9788887654321', 'Death Note Vol. 1', 200, 1, 2, NULL),
-('9788887654322', 'Death Note Vol. 2', 200, 2, 2, NULL),
-('9788887654323', 'Death Note Vol. 3', 200, 3, 2, NULL),
-('9788887654324', 'Death Note Vol. 4', 200, 4, 2, NULL),
-('9788887654325', 'Death Note Vol. 5', 200, 5, 2, NULL),
-('9788887654326', 'Death Note Vol. 6', 200, 6, 2, NULL),
-('9788887654327', 'Death Note Vol. 7', 200, 7, 2, NULL),
-('9788887654328', 'Death Note Vol. 8', 200, 8, 2, NULL),
-('9788887654329', 'Death Note Vol. 9', 200, 9, 2, NULL),
-('9788887654330', 'Death Note Vol. 10', 200, 10, 2, NULL);
+('9788887654321', 'Death Note Vol. 1', 200, 1, 2, 'Death Note Vol. 1.jpg'),
+('9788887654322', 'Death Note Vol. 2', 200, 2, 2, 'Death Note Vol. 2.jpg'),
+('9788887654323', 'Death Note Vol. 3', 200, 3, 2, 'Death Note Vol. 3.jpg'),
+('9788887654324', 'Death Note Vol. 4', 200, 4, 2, 'Death Note Vol. 4.jpg'),
+('9788887654325', 'Death Note Vol. 5', 200, 5, 2, 'Death Note Vol. 5.jpg');
 
 -- --------------------------------------------------------
 
@@ -390,18 +370,17 @@ INSERT INTO `volumi_rivenditore` (`ID_Rivenditore`, `ISBN_Volume`, `Prezzo`, `Us
 
 CREATE TABLE `volumi_utente` (
   `Nickname_Utente` varchar(40) NOT NULL,
-  `ISBN_Volume` varchar(17) NOT NULL,
-  `Qualità` varchar(255) NOT NULL
+  `ISBN_Volume` varchar(17) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dump dei dati per la tabella `volumi_utente`
 --
 
-INSERT INTO `volumi_utente` (`Nickname_Utente`, `ISBN_Volume`, `Qualità`) VALUES
-('animefan95', '9788881234567', 'Buono'),
-('mangafreak23', '9788881234567', 'Nuovo'),
-('otaku_lover', '9788887654321', 'Nuovo');
+INSERT INTO `volumi_utente` (`Nickname_Utente`, `ISBN_Volume`) VALUES
+('mk11', '9788881234569'),
+('mk11', '9788881234571'),
+('mk11', '9788881234573');
 
 --
 -- Indici per le tabelle scaricate
@@ -436,9 +415,9 @@ ALTER TABLE `autore_manga`
   ADD KEY `ID_Manga` (`ID_Manga`);
 
 --
--- Indici per le tabelle `copertina_volume`
+-- Indici per le tabelle `copertina`
 --
-ALTER TABLE `copertina_volume`
+ALTER TABLE `copertina`
   ADD PRIMARY KEY (`NomeFile`);
 
 --
@@ -461,24 +440,12 @@ ALTER TABLE `genere_manga`
   ADD KEY `ID_Genere` (`ID_Genere`);
 
 --
--- Indici per le tabelle `lingua`
---
-ALTER TABLE `lingua`
-  ADD PRIMARY KEY (`ID_Lingua`);
-
---
--- Indici per le tabelle `lingue_volume`
---
-ALTER TABLE `lingue_volume`
-  ADD PRIMARY KEY (`ID_Lingua`,`ISBN_Volume`),
-  ADD KEY `ISBN_Volume` (`ISBN_Volume`);
-
---
 -- Indici per le tabelle `manga`
 --
 ALTER TABLE `manga`
   ADD PRIMARY KEY (`ID_Manga`),
-  ADD KEY `Cod_Editore` (`Cod_Editore`);
+  ADD KEY `Cod_Editore` (`Cod_Editore`),
+  ADD KEY `Copertina` (`Copertina`);
 
 --
 -- Indici per le tabelle `rivenditore`
@@ -492,7 +459,6 @@ ALTER TABLE `rivenditore`
 --
 ALTER TABLE `utente`
   ADD PRIMARY KEY (`Nickname`),
-  ADD UNIQUE KEY `Password` (`Password`),
   ADD UNIQUE KEY `Email` (`Email`),
   ADD KEY `Regione` (`Regione`),
   ADD KEY `Città` (`Città`);
@@ -527,13 +493,13 @@ ALTER TABLE `volumi_utente`
 -- AUTO_INCREMENT per la tabella `artista`
 --
 ALTER TABLE `artista`
-  MODIFY `ID_Artista` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID_Artista` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT per la tabella `autore`
 --
 ALTER TABLE `autore`
-  MODIFY `ID_Autore` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID_Autore` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT per la tabella `genere`
@@ -542,16 +508,10 @@ ALTER TABLE `genere`
   MODIFY `ID_Genere` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT per la tabella `lingua`
---
-ALTER TABLE `lingua`
-  MODIFY `ID_Lingua` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
 -- AUTO_INCREMENT per la tabella `manga`
 --
 ALTER TABLE `manga`
-  MODIFY `ID_Manga` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID_Manga` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT per la tabella `rivenditore`
@@ -585,17 +545,11 @@ ALTER TABLE `genere_manga`
   ADD CONSTRAINT `genere_manga_ibfk_2` FOREIGN KEY (`ID_Manga`) REFERENCES `manga` (`ID_Manga`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Limiti per la tabella `lingue_volume`
---
-ALTER TABLE `lingue_volume`
-  ADD CONSTRAINT `lingue_volume_ibfk_1` FOREIGN KEY (`ID_Lingua`) REFERENCES `lingua` (`ID_Lingua`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `lingue_volume_ibfk_2` FOREIGN KEY (`ISBN_Volume`) REFERENCES `volume` (`ISBN`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Limiti per la tabella `manga`
 --
 ALTER TABLE `manga`
-  ADD CONSTRAINT `manga_ibfk_1` FOREIGN KEY (`Cod_Editore`) REFERENCES `editore` (`Cod_Editore`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `manga_ibfk_1` FOREIGN KEY (`Cod_Editore`) REFERENCES `editore` (`Cod_Editore`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `manga_ibfk_2` FOREIGN KEY (`Copertina`) REFERENCES `copertina` (`NomeFile`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Limiti per la tabella `utente`
@@ -609,7 +563,7 @@ ALTER TABLE `utente`
 --
 ALTER TABLE `volume`
   ADD CONSTRAINT `volume_ibfk_1` FOREIGN KEY (`ID_Manga`) REFERENCES `manga` (`ID_Manga`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `volume_ibfk_2` FOREIGN KEY (`Copertina`) REFERENCES `copertina_volume` (`NomeFile`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `volume_ibfk_2` FOREIGN KEY (`Copertina`) REFERENCES `copertina` (`NomeFile`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Limiti per la tabella `volumi_rivenditore`
