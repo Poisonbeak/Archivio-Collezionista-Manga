@@ -18,6 +18,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 let port = process.env.PORT || 5000;
 
+// account
+// DaniD - 84>Uy4-,
+
 const mysql = require("mysql2");
 const pool = mysql.createPool({
     host: 'localhost',

@@ -1,5 +1,6 @@
 window.addEventListener("DOMContentLoaded", e => {
-    const [nickname, password, nome, cognome, email, dataNascita, città, regione] = document.getElementsByTagName("input");
+    const [nickname, password, nome, cognome, email, dataNascita] = document.getElementsByTagName("input");
+    const [città, regione] = document.getElementsByTagName("select");
 
     const today = new Date();
     const maxDateString = today.toISOString().split('T')[0]
